@@ -1,0 +1,9 @@
+IO::Uring	T_MAGIC
+FileDescriptor	T_FILE_DESCRIPTOR
+
+INPUT
+T_FILE_DESCRIPTOR
+	{
+		PerlIO* ${var}_io = IoIFP(sv_2io($arg));
+		$var = ${var}_io ? PerlIO_fileno(${var}_io) : -1;
+	}

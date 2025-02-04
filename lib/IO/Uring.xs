@@ -72,7 +72,8 @@ void run_once(IO::Uring self, unsigned min_events = 1)
 			mPUSHu(cqe->flags);
 			PUTBACK;
 			call_sv(callback,  G_VOID | G_DISCARD | G_EVAL);
-			SvREFCNT_dec(callback);
+			if (!(cqe->flags & IORING_CQE_F_MORE))
+				SvREFCNT_dec(callback);
 
 			if (SvTRUE(ERRSV)) {
 				io_uring_cq_advance(&self->uring, self->cqe_count);

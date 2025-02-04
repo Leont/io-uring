@@ -1,4 +1,6 @@
 IO::Uring	T_MAGIC
+Signal::Info	T_OPAQUEOBJ
+Time::Spec	T_OPAQUEOBJ
 FileDescriptor	T_FILE_DESCRIPTOR
 
 INPUT

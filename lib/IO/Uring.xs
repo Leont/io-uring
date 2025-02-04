@@ -28,6 +28,8 @@ static struct io_uring_sqe* S_get_sqe(pTHX_ struct ring* ring) {
 #define get_sqe(ring) S_get_sqe(aTHX_ ring)
 
 typedef int FileDescriptor;
+typedef siginfo_t* Signal__Info;
+typedef struct __kernel_timespec* Time__Spec;
 
 #undef SvPV
 #define SvPV(sv, len) SvPVbyte(sv, len)
@@ -97,6 +99,21 @@ CODE:
 	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
 
 
+void connect(IO::Uring self, FileDescriptor fd, const char* sockaddr, size_t length(sockaddr), UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_connect(sqe, fd, (struct sockaddr*)sockaddr, STRLEN_length_of_sockaddr);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+
+
+void read(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), UV offset, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_read(sqe, fd, buffer, STRLEN_length_of_buffer, offset);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+
 void recv(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV rflags, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
@@ -109,5 +126,27 @@ void send(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_send(sqe, fd, buffer, STRLEN_length_of_buffer, sflags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+
+void timeout(IO::Uring self, Time::Spec ts, UV count, UV flags, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_timeout(sqe, ts, count, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+
+void waitid(IO::Uring self, IV idtype, IV id, Signal::Info info, IV options, UV flags, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_waitid(sqe, idtype, id, info, options, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+
+
+void write(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), UV offset, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_write(sqe, fd, buffer, STRLEN_length_of_buffer, offset);
 	io_uring_sqe_set_flags(sqe, iflags);
 	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));

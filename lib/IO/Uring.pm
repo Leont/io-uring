@@ -43,14 +43,34 @@ This creates a new uring object, with the given submission queue size.
 
 This will submit all pending requests, and process at least C<$min_events> completed (but up to C<$queue_size>) events.
 
-=method accept($fh, $flags, $s_flags, $callback)
+=method accept($sock, $flags, $s_flags, $callback)
 
 Equivalent to C<accept4($fh, $flags)>.
 
-=method recv($fh, $buffer, $flags, $s_flags, $callback)
+=method connect($sock, $sockaddr, $s_flags, $callback)
+
+Connect socket C<$sock> to address C<$sockaddr>.
+
+=method read($fh, $buffer, $offset, $s_flags, $callback)
+
+Equivalent to C<pread($fh, $buffer, $offset)>. The buffer must be preallocated to the desired size, the callback received the number of bytes in it that are actually written to. The buffer must be kept alive, typically by enclosing over it in the callback.
+
+=method recv($sock, $buffer, $flags, $s_flags, $callback)
 
 Equivalent to C<recv($fh, $buffer, $flags)>. The buffer must be preallocated to the desired size, the callback received the number of bytes in it that are actually written to. The buffer must be kept alive, typically by enclosing over it in the callback.
 
-=method send($fh, $buffer, $flags, $s_flags, $callback)
+=method send($sock, $buffer, $flags, $s_flags, $callback)
+
+Equivalent to C<send($fh, $buffer, $flags)>. The buffer must be kept alive, typically by enclosing over it in the callback.
+
+=method timeout($timespec, $count, $flags, $s_flags, $callback)
+
+This creates a timeout. C<$timespec> must refer to a L<Time::Spec|Time::Spec> object that must be kept alive through the callback. C<$count> is the number of events that should be waited on, typically it would be C<0>. C<$flags> is a bit set that may contain any of the following values: C<IORING_TIMEOUT_ABS>, C<IORING_TIMEOUT_BOOTTIME>, C<IORING_TIMEOUT_REALTIME>, C<IORING_TIMEOUT_ETIME_SUCCESS>, C<IORING_TIMEOUT_MULTISHOT>.
+
+=method waitid($id_type, $id, $info, $options, $flags, $s_flags, $callback)
+
+This waits for another process. C<$id_type> specifies the type of ID used and must be one of C<P_PID> (C<$id> is a PID), C<P_PGID> (C<$id> is a process group), C<P_PIDFD> (C<$id> is a PID fd) or C<P_ALL> (C<$id> is ignored, wait for any child). C<$info> must be a L<Signal::Info|Signal::Info> object that must be kept alive through the callback, it will contain the result of the event. C<$options> is a bitset of C<WEXITED>, C<WSTOPPED> C<WCONTINUED>, C<WNOWAIT>; typically it would be C<WEXITED>. C<$flags> is currently unused and must be C<0>.
+
+=method write($fh, $buffer, $offset, $s_flags, $callback)
 
 Equivalent to C<send($fh, $buffer, $flags)>. The buffer must be kept alive, typically by enclosing over it in the callback.

@@ -24,21 +24,25 @@ use Exporter 'import';
 
 =head1 DESCRIPTION
 
-This module is a low-level interface to C<io_uring>, Linux's new asynchronous I/O interface drastically reducing the number of system calls needed to perform I/O. Unlike previous models such as epoll it's based on a proactor model instead of a reactor model, meaning that you schedule asynchronous actions and then get notified by a callback when the action has completed.
+This module is a low-level interface to C<io_uring>, Linux's new asynchronous I/O interface drastically reducing the number of system calls needed to perform I/O. Unlike previous models such as epoll, it's based on a proactor model instead of a reactor model, meaning that you schedule asynchronous actions and then get notified by a callback when the action has completed.
 
-Generally speaking, the methods of this class match a system call 1-on-1 (e.g. C<recv>), except that they have two additional argument:
+Generally speaking, the methods of this class match a system call 1-to-1 (e.g. L<recv(2)>), except that they have two additional arguments:
 
 =over 1
 
-=item 1. The submission flags. In particular this allows you to chain actions.
+=item 1.
 
-=item 2. A callback. This callback received two integer arguments: a result (on error typically a negative errno value), and the completion flags. This callback will be kept alive by thos module, any other resources that need to be kept alive should be captured by it.
+The submission flags. In particular this allows you to chain actions.
+
+=item 2.
+
+A callback. This callback receives two integer arguments: a result (on error typically a negative errno value), and the completion flags. This callback will be kept alive by this module; any other resources that need to be kept alive should be captured by it.
 
 =back
 
 All event methods return an identifier that can be used with C<cancel>.
 
-B<Note>: this is an early release and this module should still be regarded experimental. Backwards compatibility is not yet guaranteed.
+B<Note>: This is an early release and this module should still be regarded as experimental. Backwards compatibility is not yet guaranteed.
 
 =method new($queue_size)
 
@@ -50,15 +54,15 @@ This will submit all pending requests, and process at least C<$min_events> compl
 
 =method accept($sock, $flags, $s_flags, $callback)
 
-Equivalent to C<accept4($fh, $flags)>.
+Equivalent to C<accept4($sock, $flags)>.
 
 =method cancel($identifier, $flags, $s_flags, $callback = undef)
 
-This cancels a pending request. C<$identifier> should usually be the value return by a previous event method. C<$flags> is usually C<0>, but be C<IORING_ASYNC_CANCEL_ALL>, C<IORING_ASYNC_CANCEL_FD> or C<IORING_ASYNC_CANCEL_ANY>. Note that unlike most event methods the C<$callback> is allowed to be empty.
+This cancels a pending request. C<$identifier> should usually be the value returned by a previous event method. C<$flags> is usually C<0>, but may be C<IORING_ASYNC_CANCEL_ALL>, C<IORING_ASYNC_CANCEL_FD> or C<IORING_ASYNC_CANCEL_ANY>. Note that unlike most event methods the C<$callback> is allowed to be empty.
 
 =method close($fh, $s_flags, $callback)
 
-This closes the filedescriptor C<$fh>.
+This closes the file descriptor C<$fh>.
 
 =method connect($sock, $sockaddr, $s_flags, $callback)
 
@@ -70,7 +74,7 @@ This allocates disk space in C<$fh> for C<$offset> and C<$length>.
 
 =method fsync($fh, $flags, $s_flags, $callback)
 
-This will synchronize a file's in-core state with storage device. C<flags> may be C<0> or C<IORING_FSYNC_DATASYNC>.
+This will synchronize a file's in-core state with its storage device. C<flags> may be C<0> or C<IORING_FSYNC_DATASYNC>.
 
 =method ftruncate($fh, $length, $s_flags, $callback)
 
@@ -198,7 +202,7 @@ Equivalent to C<send($fh, $buffer, $flags)>. The buffer must be kept alive, typi
 
 The following flags are all optionally exported:
 
-=head2 Submission flags:
+=head2 Submission flags
 
 These flags are passed to all event methods, and affect how the submission is processed.
 
@@ -206,12 +210,12 @@ These flags are passed to all event methods, and affect how the submission is pr
 
 =item * C<IOSQE_ASYNC>
 
-Normal operation for io_uring is to try and issue an sqe as
+Normal operation for io_uring is to try and issue an SQE as
 non-blocking first, and if that fails, execute it in an
 async manner. To support more efficient overlapped
 operation of requests that the application knows/assumes
 will always (or most of the time) block, the application
-can ask for an sqe to be issued async from the start. Note
+can ask for an SQE to be issued async from the start. Note
 that this flag immediately causes the SQE to be offloaded
 to an async helper thread with no initial non-blocking
 attempt.  This may be less efficient and should not be used
@@ -311,13 +315,13 @@ If set C<fsync> will do an C<fdatasync> instead: not sync if only metadata has c
 
 =over 4
 
-=item * RENAME_EXCHANGE
+=item * C<RENAME_EXCHANGE>
 
 Atomically exchange oldpath and newpath.  Both pathnames
 must exist but may be of different types (e.g., one could
 be a non-empty directory and the other a symbolic link).
 
-=item * RENAME_NOREPLACE
+=item * C<RENAME_NOREPLACE>
 
 Don't overwrite newpath of the rename.  Return an error if
 newpath already exists.
@@ -369,8 +373,8 @@ the 6.4 kernel.
 
 =item * C<AT_REMOVEDIR>
 
-If the AT_REMOVEDIR flag is specified, C<unlink> / C<unlinkat>
-performs the equivalent of rmdir(2) on pathname.
+If the C<AT_REMOVEDIR> flag is specified, C<unlink> / C<unlinkat>
+performs the equivalent of L<rmdir(2)> on pathname.
 
 =back
 
@@ -382,19 +386,19 @@ C<waitid> has various constants defined for it. The following values are defined
 
 =item * C<P_PID>
 
-This indicated the identifier is a process identifier.
+This indicates the identifier is a process identifier.
 
 =item * C<P_PGID>
 
-This indicated the identifier is a process group identifier.
+This indicates the identifier is a process group identifier.
 
 =item * C<P_PIDFD>
 
-This indicated the identifier is a pidfd.
+This indicates the identifier is a pidfd.
 
 =item * C<P_ALL>
 
-This indicated the identifier will be ignored and any child is waited upon.
+This indicates the identifier will be ignored and any child is waited upon.
 
 =back
 

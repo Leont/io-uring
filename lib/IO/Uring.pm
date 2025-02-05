@@ -56,9 +56,88 @@ Equivalent to C<accept4($fh, $flags)>.
 
 This cancels a pending request. C<$identifier> should usually be the value return by a previous event method. C<$flags> is usually C<0>, but be C<IORING_ASYNC_CANCEL_ALL>, C<IORING_ASYNC_CANCEL_FD> or C<IORING_ASYNC_CANCEL_ANY>. Note that unlike most event methods the C<$callback> is allowed to be empty.
 
+=method close($fh, $s_flags, $callback)
+
+This closes the filedescriptor C<$fh>.
+
 =method connect($sock, $sockaddr, $s_flags, $callback)
 
 Connect socket C<$sock> to address C<$sockaddr>.
+
+=method fallocate($fh, $offset, $length, $s_flags, $callback)
+
+This allocates disk space in C<$fh> for C<$offset> and C<$length>.
+
+=method fsync($fh, $flags, $s_flags, $callback)
+
+This will synchronize a file's in-core state with storage device. C<flags> may be C<0> or C<IORING_FSYNC_DATASYNC>.
+
+=method ftruncate($fh, $length, $s_flags, $callback)
+
+Truncate C<$fh> to length C<$length>.
+
+=method link($old_path, $new_path, $flags, $s_flags, $callback)
+
+This links the file at C<$new_path> to C<$old_path>.
+
+=method linkat($old_dir, $old_path, $new_dir, $new_path, $flags, $s_flags, $callback)
+
+This links the file at C<$new_path> in C<$new_dir> (a directory handle) to C<$old_path> in C<$old_dir>.
+
+=method link_timeout($time_spec, $flags, $s_flags, $callback = undef)
+
+This prepares a timeout request for linked submissions (using the C<IOSQE_IO_LINK>/C<IOSQE_IO_HARDLINK> submission flags). C<$timespec> must refer to a L<Time::Spec|Time::Spec> object that must be kept alive through the callback. C<$flags> is a bit set that may contain any of the following values: C<IORING_TIMEOUT_ABS>, C<IORING_TIMEOUT_BOOTTIME>, C<IORING_TIMEOUT_REALTIME>, C<IORING_TIMEOUT_ETIME_SUCCESS>, C<IORING_TIMEOUT_MULTISHOT>.
+
+Like C<cancel> and C<timeout_remove>, the C<$callback> is optional.
+
+=method mkdir($path, $mode, $s_flags, $callback)
+
+Make a new directory at C<$path> with mode C<$mode>.
+
+=method mkdirat($dirhandle, $path, $mode, $s_flags, $callback)
+
+Make a new directory at C<$path> under C<$dirhandle> with mode C<$mode>.
+
+=method nop($s_flags, $callback)
+
+This executes a no-op.
+
+=method open($path, $flags, $mode, $s_flags, $callback)
+
+Open a file at C<$path> with C<$flags> and C<mode>.
+
+=method openat($dirhandle, $path, $flags, $mode, $s_flags, $callback)
+
+Open a file at C<$path> under C<$dirhandle> with C<$flags> and C<mode>.
+
+=method poll($fh, $mask, $s_flags, $callback)
+
+This will poll file handle C<$fh> once. C<$mask> can have the same values as synchronous poll (e.g. C<POLLIN>, C<POLLOUT>).
+
+=method poll_multishot($fh, $mask, $s_flags, $callback)
+
+This will poll file handle C<$fh> and repeatedly call C<$callback> whenever new data is available. C<$mask> can have the same values as synchronous poll (e.g. C<POLLIN>, C<POLLOUT>).
+
+=method shutdown($fh, $how, $s_flags, $callback)
+
+This shuts down a part of a connection, the same way the core builtin C<shutdown($fh, $how)> does.
+
+=method splice($fh_in, $off_in, $fh_out, $off_out, $nbytes, $flags, $s_flags, $callback)
+
+This moves data between two file descriptors without copying
+between kernel address space and user address space.  It transfers
+up to size bytes of data from the file descriptor C<$fh_in> to the
+file descriptor C<fh_out>, where one of the file descriptors must
+refer to a pipe.
+
+For a pipe file descriptor the associated offset must be -1. If set
+it will be used as the offset in the file or block device to start the read.
+
+C<flags> must currently be C<0>.
+
+=method sync_file_range($fh, $length, $offset, $flags, $s_flags, $callback)
+
+This synchronises the given range to disk. C<$flags> must currently be C<0>.
 
 =method read($fh, $buffer, $offset, $s_flags, $callback)
 
@@ -68,13 +147,44 @@ Equivalent to C<pread($fh, $buffer, $offset)>. The buffer must be preallocated t
 
 Equivalent to C<recv($fh, $buffer, $flags)>. The buffer must be preallocated to the desired size, the callback received the number of bytes in it that are actually written to. The buffer must be kept alive, typically by enclosing over it in the callback.
 
+=method rename($old_path, $new_path, $flags, $s_flags, $callback)
+
+This renames the file at C<$old_path> to C<$new_path>.
+
+=method renameat($old_dir, $old_path, $new_dir, $new_path, $flags, $s_flags, $callback)
+
+This renames the file at C<$old_path> in C<$old_dir> (a directory handle) to C<$new_path> in C<$new_dir>.
+
 =method send($sock, $buffer, $flags, $s_flags, $callback)
 
 Equivalent to C<send($fh, $buffer, $flags)>. The buffer must be kept alive, typically by enclosing over it in the callback.
 
+=method tee($fh_in, $fh_out, $nbytes, $flags, $callback)
+
+This prepares a tee request. This will use as input the file
+descriptor C<$fh_in> and as output the file descriptor C<$fh_out>
+duplicating C<$nbytes> bytes worth of data. C<$flags> are modifier
+flags for the operation and must currently be C<0>.
+
 =method timeout($timespec, $count, $flags, $s_flags, $callback)
 
 This creates a timeout. C<$timespec> must refer to a L<Time::Spec|Time::Spec> object that must be kept alive through the callback. C<$count> is the number of events that should be waited on, typically it would be C<0>. C<$flags> is a bit set that may contain any of the following values: C<IORING_TIMEOUT_ABS>, C<IORING_TIMEOUT_BOOTTIME>, C<IORING_TIMEOUT_REALTIME>, C<IORING_TIMEOUT_ETIME_SUCCESS>, C<IORING_TIMEOUT_MULTISHOT>.
+
+=method timeout_remove($id, $flags, $s_flags, $callback = undef)
+
+Remove a timeout identified by C<$id>. C<$flags> is currently unused and must be C<0>. Like C<cancel> and C<link_timeout>, the callback is optional.
+
+=method timeout_update($id, $timespec, $flags, $s_flags, $callback)
+
+This updates the timer identifiers by C<$id>. C<timespec> and C<flags> have the same meaning as in C<timeout>.
+
+=method unlink($path, $mode, $s_flags, $callback)
+
+Remove a file or directory at C<$path> with flags C<$flags>.
+
+=method unlinkat($dirhandle, $path, $mode, $s_flags, $callback)
+
+Remove a file or directory at C<$path> under C<$dirhandle> with flags C<$flags>.
 
 =method waitid($id_type, $id, $info, $options, $flags, $s_flags, $callback)
 
@@ -185,6 +295,39 @@ in the ring. Available since 5.19.
 
 =back
 
+=head3 fsync
+
+The only allowed flag value for C<fsync>:
+
+=over 4
+
+=item * C<IORING_FSYNC_DATASYNC>
+
+If set C<fsync> will do an C<fdatasync> instead: not sync if only metadata has changed.
+
+=back
+
+=head3 remove / removeat
+
+=over 4
+
+=item * RENAME_EXCHANGE
+
+Atomically exchange oldpath and newpath.  Both pathnames
+must exist but may be of different types (e.g., one could
+be a non-empty directory and the other a symbolic link).
+
+=item * RENAME_NOREPLACE
+
+Don't overwrite newpath of the rename.  Return an error if
+newpath already exists.
+
+C<RENAME_NOREPLACE> can't be employed together with
+C<RENAME_EXCHANGE>. C<RENAME_NOREPLACE> requires support
+from the underlying filesystem.
+
+=back
+
 =head3 timeout
 
 =over 4
@@ -217,6 +360,17 @@ are expected. The value specified in count is the number of
 repeats. A value of 0 means the timeout is indefinite and
 can only be stopped by a removal request. Available since
 the 6.4 kernel.
+
+=back
+
+=head3 unlink / unlinkat
+
+=over 4
+
+=item * C<AT_REMOVEDIR>
+
+If the AT_REMOVEDIR flag is specified, C<unlink> / C<unlinkat>
+performs the equivalent of rmdir(2) on pathname.
 
 =back
 

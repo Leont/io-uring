@@ -28,6 +28,7 @@ static struct io_uring_sqe* S_get_sqe(pTHX_ struct ring* ring) {
 #define get_sqe(ring) S_get_sqe(aTHX_ ring)
 
 typedef int FileDescriptor;
+typedef int DirDescriptor;
 typedef siginfo_t* Signal__Info;
 typedef struct __kernel_timespec* Time__Spec;
 
@@ -60,11 +61,18 @@ BOOT:
 	URING_CONSTANT(ASYNC_CANCEL_FD);
 	URING_CONSTANT(ASYNC_CANCEL_ANY);
 
+	URING_CONSTANT(FSYNC_DATASYNC);
+
 	URING_CONSTANT(TIMEOUT_ABS);
 	URING_CONSTANT(TIMEOUT_BOOTTIME);
 	URING_CONSTANT(TIMEOUT_REALTIME);
 	URING_CONSTANT(TIMEOUT_ETIME_SUCCESS);
 	URING_CONSTANT(TIMEOUT_MULTISHOT);
+
+	CONSTANT(RENAME_EXCHANGE);
+	CONSTANT(RENAME_NOREPLACE);
+
+	CONSTANT(AT_REMOVEDIR);
 
 	CONSTANT(P_PID);
 	CONSTANT(P_PGID);
@@ -160,6 +168,161 @@ OUTPUT:
 	RETVAL
 
 
+UV close(IO::Uring self, FileDescriptor fd, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_close(sqe, fd);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV fallocate(IO::Uring self, FileDescriptor fd, UV offset, UV length, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_fallocate(sqe, fd, 0, offset, length);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV fsync(IO::Uring self, FileDescriptor fd, UV flags, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_fsync(sqe, fd, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV ftruncate(IO::Uring self, FileDescriptor fd, UV length, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_ftruncate(sqe, fd, length);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV link(IO::Uring self, const char* oldpath, const char* newpath, int flags, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_link(sqe, oldpath, newpath, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV linkat(IO::Uring self, DirDescriptor olddir, const char* oldpath, DirDescriptor newdir, const char* newpath, int flags, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_linkat(sqe, olddir, oldpath, newdir, newpath, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV link_timeout(IO::Uring self, Time::Spec ts, UV flags, UV iflags, SV* callback = &PL_sv_undef)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_link_timeout(sqe, ts, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	void* cancel_data = SvOK(callback) ? SvREFCNT_inc(callback) : NULL;
+	io_uring_sqe_set_data(sqe, cancel_data);
+	RETVAL = PTR2UV(cancel_data);
+OUTPUT:
+	RETVAL
+
+
+UV mkdir(IO::Uring self, const char* path, UV mode, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_mkdir(sqe, path, mode);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV mkdirat(IO::Uring self, DirDescriptor dir_fd, const char* path, UV mode, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_mkdirat(sqe, dir_fd, path, mode);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV nop(IO::Uring self, const char* path, int flags, UV mode, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_nop(sqe);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV open(IO::Uring self, const char* path, int flags, UV mode, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_open(sqe, path, flags, mode);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV openat(IO::Uring self, DirDescriptor dir_fd, const char* path, int flags, UV mode, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_openat(sqe, dir_fd, path, flags, mode);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV poll(IO::Uring self, FileDescriptor fd, UV poll_mask, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_poll_add(sqe, fd, poll_mask);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV poll_multishot(IO::Uring self, FileDescriptor fd, UV poll_mask, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_poll_multishot(sqe, fd, poll_mask);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
 UV read(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), UV offset, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
@@ -170,10 +333,33 @@ CODE:
 OUTPUT:
 	RETVAL
 
+
 UV recv(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV rflags, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_recv(sqe, fd, buffer, STRLEN_length_of_buffer, rflags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV rename(IO::Uring self, const char* oldpath, const char* newpath, int flags, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_renameat(sqe, AT_FDCWD, oldpath, AT_FDCWD, newpath, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV renameat(IO::Uring self, DirDescriptor olddir, const char* oldpath, DirDescriptor newdir, const char* newpath, int flags, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_renameat(sqe, olddir, oldpath, newdir, newpath, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
 	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
 	RETVAL = PTR2UV(callback);
@@ -191,6 +377,51 @@ CODE:
 OUTPUT:
 	RETVAL
 
+
+UV shutdown(IO::Uring self, FileDescriptor fd, IV how, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_shutdown(sqe, fd, how);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV splice(IO::Uring self, FileDescriptor in, IV off_in, FileDescriptor out, IV off_out, UV nbytes, UV flags, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_splice(sqe, in, off_in, out, off_out, nbytes, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV sync_file_range(IO::Uring self, FileDescriptor fd, UV length, UV offset, int flags, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_sync_file_range(sqe, fd, length, offset, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV tee(IO::Uring self, FileDescriptor in, FileDescriptor out, UV nbytes, UV flags, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_tee(sqe, in, out, nbytes, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
 UV timeout(IO::Uring self, Time::Spec ts, UV count, UV flags, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
@@ -200,6 +431,52 @@ CODE:
 	RETVAL = PTR2UV(callback);
 OUTPUT:
 	RETVAL
+
+
+UV timeout_remove(IO::Uring self, UV user_data, UV flags, UV iflags, SV* callback = &PL_sv_undef)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_timeout_remove(sqe, user_data, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	void* cancel_data = SvOK(callback) ? SvREFCNT_inc(callback) : NULL;
+	io_uring_sqe_set_data(sqe, cancel_data);
+	RETVAL = PTR2UV(cancel_data);
+OUTPUT:
+	RETVAL
+
+
+UV timeout_update(IO::Uring self, Time::Spec ts, UV user_data, UV flags, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_timeout_update(sqe, ts, user_data, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV unlink(IO::Uring self, const char* path, int flags, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_unlink(sqe, path, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV unlinkat(IO::Uring self, DirDescriptor dir_fd, const char* path, int flags, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_unlinkat(sqe, dir_fd, path, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
 
 UV waitid(IO::Uring self, IV idtype, IV id, Signal::Info info, IV options, UV flags, UV iflags, SV* callback)
 CODE:

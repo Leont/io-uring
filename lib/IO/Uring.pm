@@ -33,6 +33,8 @@ Generally speaking, the methods of this class match a system call 1-on-1 (e.g. C
 
 =back
 
+All event methods return an identifier that can be used with C<cancel>.
+
 B<Note>: this is an early release and this module should still be regarded experimental. Backwards compatibility is not yet guaranteed.
 
 =method new($queue_size)
@@ -46,6 +48,10 @@ This will submit all pending requests, and process at least C<$min_events> compl
 =method accept($sock, $flags, $s_flags, $callback)
 
 Equivalent to C<accept4($fh, $flags)>.
+
+=method cancel($identifier, $flags, $s_flags, $callback = undef)
+
+This cancels a pending request. C<$identifier> should usually be the value return by a previous event method. C<$flags> is usually C<0>, but be C<IORING_ASYNC_CANCEL_ALL>, C<IORING_ASYNC_CANCEL_FD> or C<IORING_ASYNC_CANCEL_ANY>. Note that unlike most event methods the C<$callback> is allowed to be empty.
 
 =method connect($sock, $sockaddr, $s_flags, $callback)
 

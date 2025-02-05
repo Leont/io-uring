@@ -62,7 +62,7 @@ This cancels a pending request. C<$identifier> should usually be the value retur
 
 =method close($fh, $s_flags, $callback)
 
-This closes the file descriptor C<$fh>.
+This closes the filehandle C<$fh>.
 
 =method connect($sock, $sockaddr, $s_flags, $callback)
 
@@ -128,13 +128,13 @@ This shuts down a part of a connection, the same way the core builtin C<shutdown
 
 =method splice($fh_in, $off_in, $fh_out, $off_out, $nbytes, $flags, $s_flags, $callback)
 
-This moves data between two file descriptors without copying
+This moves data between two file handle without copying
 between kernel address space and user address space.  It transfers
-up to size bytes of data from the file descriptor C<$fh_in> to the
-file descriptor C<fh_out>, where one of the file descriptors must
+up to size bytes of data from the file handle C<$fh_in> to the
+file handle C<fh_out>, where one of the file handles must
 refer to a pipe.
 
-For a pipe file descriptor the associated offset must be -1. If set
+For a pipe file handles the associated offset must be -1. If set
 it will be used as the offset in the file or block device to start the read.
 
 C<flags> must currently be C<0>.
@@ -166,7 +166,7 @@ Equivalent to C<send($fh, $buffer, $flags)>. The buffer must be kept alive, typi
 =method tee($fh_in, $fh_out, $nbytes, $flags, $callback)
 
 This prepares a tee request. This will use as input the file
-descriptor C<$fh_in> and as output the file descriptor C<$fh_out>
+handle C<$fh_in> and as output the file handle C<$fh_out>
 duplicating C<$nbytes> bytes worth of data. C<$flags> are modifier
 flags for the operation and must currently be C<0>.
 
@@ -288,13 +288,13 @@ than just canceling the first one found. Available since
 
 =item * C<IORING_ASYNC_CANCEL_FD>
 
-Match based on the file descriptor used in the original
+Match based on the file handle used in the original
 request rather than the user_data. Available since 5.19.
 
 =item * C<IORING_ASYNC_CANCEL_ANY>
 
 Match any request in the ring, regardless of user_data or
-file descriptor.  Can be used to cancel any pending request
+file handle.  Can be used to cancel any pending request
 in the ring. Available since 5.19.
 
 =back

@@ -102,7 +102,10 @@ void DESTROY(IO::Uring self)
 
 void run_once(IO::Uring self, unsigned min_events = 1)
 	PPCODE:
-	io_uring_submit_and_wait(&self->uring, min_events);
+	int result = io_uring_submit_and_wait(&self->uring, min_events);
+
+	if (result == -1 && errno == EINTR)
+		PERL_ASYNC_CHECK();
 
 	struct io_uring_cqe *cqe;
 	unsigned head;

@@ -1,6 +1,7 @@
 Revision history for IO-Uring
 
 {{$NEXT}}
+          - Add bind, listen, sendto and socket methods
 
 0.001     2025-02-05 20:57:49+01:00 Europe/Brussels
           Initial release to an unsuspecting world

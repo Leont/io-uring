@@ -148,6 +148,17 @@ OUTPUT:
 	RETVAL
 
 
+UV bind(IO::Uring self, FileDescriptor fd, const char* sockaddr, size_t length(sockaddr), UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_bind(sqe, fd, (struct sockaddr*)sockaddr, STRLEN_length_of_sockaddr);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
 UV cancel(IO::Uring self, UV user_data, UV flags, UV iflags, SV* callback = &PL_sv_undef)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
@@ -245,6 +256,17 @@ CODE:
 	void* cancel_data = SvOK(callback) ? SvREFCNT_inc(callback) : NULL;
 	io_uring_sqe_set_data(sqe, cancel_data);
 	RETVAL = PTR2UV(cancel_data);
+OUTPUT:
+	RETVAL
+
+
+UV listen(IO::Uring self, FileDescriptor fd, UV backlog, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_listen(sqe, fd, backlog);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
 OUTPUT:
 	RETVAL
 
@@ -374,6 +396,28 @@ UV send(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), 
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_send(sqe, fd, buffer, STRLEN_length_of_buffer, sflags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV sendto(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV sflags, char* name, size_t length(name), UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_send(sqe, fd, buffer, STRLEN_length_of_buffer, sflags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
+	RETVAL = PTR2UV(callback);
+OUTPUT:
+	RETVAL
+
+
+UV socket(IO::Uring self, int domain, int type, int protocols, int flags, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_socket(sqe, domain, type, protocols, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
 	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
 	RETVAL = PTR2UV(callback);

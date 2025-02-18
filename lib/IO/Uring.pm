@@ -56,6 +56,10 @@ This will submit all pending requests, and process at least C<$min_events> compl
 
 Equivalent to C<accept4($sock, $flags)>.
 
+=method bind($sock, $sockaddr, $s_flags, $callback)
+
+Bind the socket C<$sock> to C<$sockaddr>.
+
 =method cancel($identifier, $flags, $s_flags, $callback = undef)
 
 This cancels a pending request. C<$identifier> should usually be the value returned by a previous event method. C<$flags> is usually C<0>, but may be C<IORING_ASYNC_CANCEL_ALL>, C<IORING_ASYNC_CANCEL_FD> or C<IORING_ASYNC_CANCEL_ANY>. Note that unlike most event methods the C<$callback> is allowed to be empty.
@@ -79,6 +83,10 @@ This will synchronize a file's in-core state with its storage device. C<flags> m
 =method ftruncate($fh, $length, $s_flags, $callback)
 
 Truncate C<$fh> to length C<$length>.
+
+=method listen($fh, $count)
+
+Mark the socket referred to by C<$fh> as a passive socket, that is, as a socket that will be used to C<accept> incoming connection requests using accept(2). C<$count> is the maximum backlog site for pending connections.
 
 =method link($old_path, $new_path, $flags, $s_flags, $callback)
 
@@ -162,6 +170,14 @@ This renames the file at C<$old_path> in C<$old_dir> (a directory handle) to C<$
 =method send($sock, $buffer, $flags, $s_flags, $callback)
 
 Equivalent to C<send($fh, $buffer, $flags)>. The buffer must be kept alive, typically by enclosing over it in the callback.
+
+=method sendto($sock, $buffer, $flags, $sockaddr, $s_flags, $callback)
+
+Send a buffer to a specific address. The buffer and address must be kept alive, typically by enclosing over it in the callback.
+
+=method socket($domain, $type, $protocol, $flags, $s_flags, $callback)
+
+Create a new socket of the given C<$domain>, C<$type> and C<$protocol>.
 
 =method tee($fh_in, $fh_out, $nbytes, $flags, $callback)
 

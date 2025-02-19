@@ -46,11 +46,11 @@ B<Note>: This is an early release and this module should still be regarded as ex
 
 =method new($queue_size)
 
-This creates a new uring object, with the given submission queue size.
+Create a new uring object, with the given submission queue size.
 
 =method run_once($min_events = 1)
 
-This will submit all pending requests, and process at least C<$min_events> completed (but up to C<$queue_size>) events.
+Submit all pending requests, and process at least C<$min_events> completed (but up to C<$queue_size>) events.
 
 =method probe()
 
@@ -58,7 +58,7 @@ This probes for which features are supported on this system. It returns a hash o
 
 =method accept($sock, $flags, $s_flags, $callback)
 
-Equivalent to C<accept4($sock, $flags)>.
+Accept a new socket from listening socket C<$sock>.
 
 =method bind($sock, $sockaddr, $s_flags, $callback)
 
@@ -66,11 +66,11 @@ Bind the socket C<$sock> to C<$sockaddr>.
 
 =method cancel($identifier, $flags, $s_flags, $callback = undef)
 
-This cancels a pending request. C<$identifier> should usually be the value returned by a previous event method. C<$flags> is usually C<0>, but may be C<IORING_ASYNC_CANCEL_ALL>, C<IORING_ASYNC_CANCEL_FD> or C<IORING_ASYNC_CANCEL_ANY>. Note that unlike most event methods the C<$callback> is allowed to be empty.
+Cancel a pending request. C<$identifier> should usually be the value returned by a previous event method. C<$flags> is usually C<0>, but may be C<IORING_ASYNC_CANCEL_ALL>, C<IORING_ASYNC_CANCEL_FD> or C<IORING_ASYNC_CANCEL_ANY>. Note that unlike most event methods the C<$callback> is allowed to be empty.
 
 =method close($fh, $s_flags, $callback)
 
-This closes the filehandle C<$fh>.
+Close the filehandle C<$fh>.
 
 =method connect($sock, $sockaddr, $s_flags, $callback)
 
@@ -78,11 +78,11 @@ Connect socket C<$sock> to address C<$sockaddr>.
 
 =method fallocate($fh, $offset, $length, $s_flags, $callback)
 
-This allocates disk space in C<$fh> for C<$offset> and C<$length>.
+Allocate disk space in C<$fh> for C<$offset> and C<$length>.
 
 =method fsync($fh, $flags, $s_flags, $callback)
 
-This will synchronize a file's in-core state with its storage device. C<flags> may be C<0> or C<IORING_FSYNC_DATASYNC>.
+Synchronize a file's in-core state with its storage device. C<flags> may be C<0> or C<IORING_FSYNC_DATASYNC>.
 
 =method ftruncate($fh, $length, $s_flags, $callback)
 
@@ -94,15 +94,15 @@ Mark the socket referred to by C<$fh> as a passive socket, that is, as a socket 
 
 =method link($old_path, $new_path, $flags, $s_flags, $callback)
 
-This links the file at C<$new_path> to C<$old_path>.
+Link the file at C<$new_path> to C<$old_path>.
 
 =method linkat($old_dir, $old_path, $new_dir, $new_path, $flags, $s_flags, $callback)
 
-This links the file at C<$new_path> in C<$new_dir> (a directory handle) to C<$old_path> in C<$old_dir>.
+Link the file at C<$new_path> in C<$new_dir> (a directory handle) to C<$old_path> in C<$old_dir>.
 
 =method link_timeout($time_spec, $flags, $s_flags, $callback = undef)
 
-This prepares a timeout request for linked submissions (using the C<IOSQE_IO_LINK>/C<IOSQE_IO_HARDLINK> submission flags). C<$timespec> must refer to a L<Time::Spec|Time::Spec> object that must be kept alive through the callback. C<$flags> is a bit set that may contain any of the following values: C<IORING_TIMEOUT_ABS>, C<IORING_TIMEOUT_BOOTTIME>, C<IORING_TIMEOUT_REALTIME>, C<IORING_TIMEOUT_ETIME_SUCCESS>, C<IORING_TIMEOUT_MULTISHOT>.
+Prepare a timeout request for linked submissions (using the C<IOSQE_IO_LINK>/C<IOSQE_IO_HARDLINK> submission flags). C<$timespec> must refer to a L<Time::Spec|Time::Spec> object that must be kept alive until submission (usually through the callback). C<$flags> is a bit set that may contain any of the following values: C<IORING_TIMEOUT_ABS>, C<IORING_TIMEOUT_BOOTTIME>, C<IORING_TIMEOUT_REALTIME>, C<IORING_TIMEOUT_ETIME_SUCCESS>, C<IORING_TIMEOUT_MULTISHOT>.
 
 Like C<cancel> and C<timeout_remove>, the C<$callback> is optional.
 
@@ -128,20 +128,20 @@ Open a file at C<$path> under C<$dirhandle> with C<$flags> and C<mode>.
 
 =method poll($fh, $mask, $s_flags, $callback)
 
-This will poll file handle C<$fh> once. C<$mask> can have the same values as synchronous poll (e.g. C<POLLIN>, C<POLLOUT>).
+Poll the file handle C<$fh> once. C<$mask> can have the same values as synchronous poll (e.g. C<POLLIN>, C<POLLOUT>).
 
 =method poll_multishot($fh, $mask, $s_flags, $callback)
 
-This will poll file handle C<$fh> and repeatedly call C<$callback> whenever new data is available. C<$mask> can have the same values as synchronous poll (e.g. C<POLLIN>, C<POLLOUT>).
+Poll the file handle C<$fh> and repeatedly call C<$callback> whenever new data is available. C<$mask> can have the same values as synchronous poll (e.g. C<POLLIN>, C<POLLOUT>).
 
 =method shutdown($fh, $how, $s_flags, $callback)
 
-This shuts down a part of a connection, the same way the core builtin C<shutdown($fh, $how)> does.
+Shut down a part of a connection, the same way the core builtin C<shutdown($fh, $how)> does.
 
 =method splice($fh_in, $off_in, $fh_out, $off_out, $nbytes, $flags, $s_flags, $callback)
 
-This moves data between two file handle without copying
-between kernel address space and user address space.  It transfers
+Move data between two file handle without copying
+between kernel address space and user address space. It transfers
 up to size bytes of data from the file handle C<$fh_in> to the
 file handle C<fh_out>, where one of the file handles must
 refer to a pipe.
@@ -153,7 +153,7 @@ C<flags> must currently be C<0>.
 
 =method sync_file_range($fh, $length, $offset, $flags, $s_flags, $callback)
 
-This synchronises the given range to disk. C<$flags> must currently be C<0>.
+Synchronize the given range to disk. C<$flags> must currently be C<0>.
 
 =method read($fh, $buffer, $offset, $s_flags, $callback)
 
@@ -165,11 +165,11 @@ Equivalent to C<recv($fh, $buffer, $flags)>. The buffer must be preallocated to 
 
 =method rename($old_path, $new_path, $flags, $s_flags, $callback)
 
-This renames the file at C<$old_path> to C<$new_path>.
+Rename the file at C<$old_path> to C<$new_path>.
 
 =method renameat($old_dir, $old_path, $new_dir, $new_path, $flags, $s_flags, $callback)
 
-This renames the file at C<$old_path> in C<$old_dir> (a directory handle) to C<$new_path> in C<$new_dir>.
+Rename the file at C<$old_path> in C<$old_dir> (a directory handle) to C<$new_path> in C<$new_dir>.
 
 =method send($sock, $buffer, $flags, $s_flags, $callback)
 
@@ -185,14 +185,14 @@ Create a new socket of the given C<$domain>, C<$type> and C<$protocol>.
 
 =method tee($fh_in, $fh_out, $nbytes, $flags, $callback)
 
-This prepares a tee request. This will use as input the file
+Prepare a tee request. This will use as input the file
 handle C<$fh_in> and as output the file handle C<$fh_out>
 duplicating C<$nbytes> bytes worth of data. C<$flags> are modifier
 flags for the operation and must currently be C<0>.
 
 =method timeout($timespec, $count, $flags, $s_flags, $callback)
 
-This creates a timeout. C<$timespec> must refer to a L<Time::Spec|Time::Spec> object that must be kept alive through the callback. C<$count> is the number of events that should be waited on, typically it would be C<0>. C<$flags> is a bit set that may contain any of the following values: C<IORING_TIMEOUT_ABS>, C<IORING_TIMEOUT_BOOTTIME>, C<IORING_TIMEOUT_REALTIME>, C<IORING_TIMEOUT_ETIME_SUCCESS>, C<IORING_TIMEOUT_MULTISHOT>.
+Create a timeout. C<$timespec> must refer to a L<Time::Spec|Time::Spec> object that must be kept alive through the callback. C<$count> is the number of events that should be waited on, typically it would be C<0>. C<$flags> is a bit set that may contain any of the following values: C<IORING_TIMEOUT_ABS>, C<IORING_TIMEOUT_BOOTTIME>, C<IORING_TIMEOUT_REALTIME>, C<IORING_TIMEOUT_ETIME_SUCCESS>, C<IORING_TIMEOUT_MULTISHOT>.
 
 =method timeout_remove($id, $flags, $s_flags, $callback = undef)
 
@@ -200,7 +200,7 @@ Remove a timeout identified by C<$id>. C<$flags> is currently unused and must be
 
 =method timeout_update($id, $timespec, $flags, $s_flags, $callback)
 
-This updates the timer identifiers by C<$id>. C<timespec> and C<flags> have the same meaning as in C<timeout>.
+Update the timer identifiers by C<$id>. C<timespec> and C<flags> have the same meaning as in C<timeout>.
 
 =method unlink($path, $mode, $s_flags, $callback)
 
@@ -212,7 +212,7 @@ Remove a file or directory at C<$path> under C<$dirhandle> with flags C<$flags>.
 
 =method waitid($id_type, $id, $info, $options, $flags, $s_flags, $callback)
 
-This waits for another process. C<$id_type> specifies the type of ID used and must be one of C<P_PID> (C<$id> is a PID), C<P_PGID> (C<$id> is a process group), C<P_PIDFD> (C<$id> is a PID fd) or C<P_ALL> (C<$id> is ignored, wait for any child). C<$info> must be a L<Signal::Info|Signal::Info> object that must be kept alive through the callback, it will contain the result of the event. C<$options> is a bitset of C<WEXITED>, C<WSTOPPED> C<WCONTINUED>, C<WNOWAIT>; typically it would be C<WEXITED>. C<$flags> is currently unused and must be C<0>. When the callback is triggered the following entries of C<$info> will be set: C<pid>, C<uid>, C<signo> (will always be C<SIGCHLD>), C<status> and C<code> (C<CLD_EXITED>, C<CLD_KILLED>)
+Wait for another process. C<$id_type> specifies the type of ID used and must be one of C<P_PID> (C<$id> is a PID), C<P_PGID> (C<$id> is a process group), C<P_PIDFD> (C<$id> is a PID fd) or C<P_ALL> (C<$id> is ignored, wait for any child). C<$info> must be a L<Signal::Info|Signal::Info> object that must be kept alive through the callback, it will contain the result of the event. C<$options> is a bitset of C<WEXITED>, C<WSTOPPED> C<WCONTINUED>, C<WNOWAIT>; typically it would be C<WEXITED>. C<$flags> is currently unused and must be C<0>. When the callback is triggered the following entries of C<$info> will be set: C<pid>, C<uid>, C<signo> (will always be C<SIGCHLD>), C<status> and C<code> (C<CLD_EXITED>, C<CLD_KILLED>)
 
 =method write($fh, $buffer, $offset, $s_flags, $callback)
 
@@ -238,7 +238,7 @@ will always (or most of the time) block, the application
 can ask for an SQE to be issued async from the start. Note
 that this flag immediately causes the SQE to be offloaded
 to an async helper thread with no initial non-blocking
-attempt.  This may be less efficient and should not be used
+attempt. This may be less efficient and should not be used
 liberally or without understanding the performance and
 efficiency tradeoffs.
 

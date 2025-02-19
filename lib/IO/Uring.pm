@@ -327,6 +327,24 @@ If set C<fsync> will do an C<fdatasync> instead: not sync if only metadata has c
 
 =back
 
+=head3 link / linkat
+
+=over 4
+
+=item * C<AT_SYMLINK_FOLLOW>
+
+=back
+
+=head3 recv / send / sendto
+
+=over 4
+
+=item * C<IORING_RECVSEND_POLL_FIRST>
+
+If set, C<io_uring> will assume the socket is currently empty and attempting to receive data will be unsuccessful. For this case, io_uring will arm internal poll and trigger a receive of the data when the socket has data to be read. This initial receive attempt can be wasteful for the case where the socket is expected to be empty, setting this flag will bypass the initial receive attempt and go straight to arming poll. If poll does indicate that data is ready to be received, the operation will proceed.
+
+=back
+
 =head3 remove / removeat
 
 =over 4

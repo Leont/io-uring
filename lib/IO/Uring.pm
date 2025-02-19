@@ -52,6 +52,10 @@ This creates a new uring object, with the given submission queue size.
 
 This will submit all pending requests, and process at least C<$min_events> completed (but up to C<$queue_size>) events.
 
+=method probe()
+
+This probes for which features are supported on this system. It returns a hash of feature-name to true/false. Generally speaking feature names map directly to method names but note that for filesystem operations you should check for the C<*at> version (e.g. C<'openat'> not C<'open'>).
+
 =method accept($sock, $flags, $s_flags, $callback)
 
 Equivalent to C<accept4($sock, $flags)>.

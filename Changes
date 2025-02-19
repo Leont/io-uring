@@ -2,6 +2,7 @@ Revision history for IO-Uring
 
 {{$NEXT}}
           - Add bind, listen, sendto and socket methods
+          - Add probe method
           - Add RECVSEND_POLL_FIRST and AT_SYMLINK_FOLLOW constants
 
 0.001     2025-02-05 20:57:49+01:00 Europe/Brussels

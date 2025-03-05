@@ -11,6 +11,16 @@ typedef struct ring {
 	unsigned cqe_count;
 } *IO__Uring;
 
+int uring_destroy(pTHX_ SV* sv, MAGIC* magic) {
+	struct ring* self = (struct ring*)magic->mg_ptr;
+	io_uring_queue_exit(&self->uring);
+	safefree(self);
+}
+
+static const MGVTBL IO__Uring_magic = {
+	.svt_free = uring_destroy,
+};
+
 static struct io_uring_sqe* S_get_sqe(pTHX_ struct ring* ring) {
 	struct io_uring_sqe* sqe = io_uring_get_sqe(&ring->uring);
 
@@ -161,12 +171,6 @@ CODE:
 	io_uring_queue_init_params(entries, &RETVAL->uring, &params);
 OUTPUT:
 	RETVAL
-
-
-void DESTROY(IO::Uring self)
-	CODE:
-	io_uring_queue_exit(&self->uring);
-	safefree(self);
 
 
 void run_once(IO::Uring self, unsigned min_events = 1)

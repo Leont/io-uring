@@ -159,7 +159,7 @@ Synchronize the given range to disk. C<$flags> must currently be C<0>.
 
 Equivalent to C<pread($fh, $buffer, $offset)>. The buffer must be preallocated to the desired size, the callback received the number of bytes in it that are actually written to. The buffer must be kept alive, typically by enclosing over it in the callback.
 
-=method recv($sock, $buffer, $flags, $s_flags, $callback)
+=method recv($sock, $buffer, $flags, $pflags, $s_flags, $callback)
 
 Equivalent to C<recv($fh, $buffer, $flags)>. The buffer must be preallocated to the desired size, the callback received the number of bytes in it that are actually written to. The buffer must be kept alive, typically by enclosing over it in the callback.
 
@@ -171,11 +171,11 @@ Rename the file at C<$old_path> to C<$new_path>.
 
 Rename the file at C<$old_path> in C<$old_dir> (a directory handle) to C<$new_path> in C<$new_dir>.
 
-=method send($sock, $buffer, $flags, $s_flags, $callback)
+=method send($sock, $buffer, $flags, $pflags, $s_flags, $callback)
 
 Equivalent to C<send($fh, $buffer, $flags)>. The buffer must be kept alive, typically by enclosing over it in the callback.
 
-=method sendto($sock, $buffer, $flags, $sockaddr, $s_flags, $callback)
+=method sendto($sock, $buffer, $flags, $sockaddr, $pflags, $s_flags, $callback)
 
 Send a buffer to a specific address. The buffer and address must be kept alive, typically by enclosing over it in the callback.
 

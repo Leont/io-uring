@@ -448,11 +448,12 @@ OUTPUT:
 	RETVAL
 
 
-UV recv(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV rflags, UV iflags, SV* callback)
+UV recv(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV rflags, UV pflags, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_recv(sqe, fd, buffer, STRLEN_length_of_buffer, rflags);
 	io_uring_sqe_set_flags(sqe, iflags);
+	sqe->ioprio |= pflags;
 	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
 	RETVAL = PTR2UV(callback);
 OUTPUT:
@@ -481,22 +482,24 @@ OUTPUT:
 	RETVAL
 
 
-UV send(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV sflags, UV iflags, SV* callback)
+UV send(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV sflags, UV pflags, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_send(sqe, fd, buffer, STRLEN_length_of_buffer, sflags);
 	io_uring_sqe_set_flags(sqe, iflags);
+	sqe->ioprio = pflags;
 	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
 	RETVAL = PTR2UV(callback);
 OUTPUT:
 	RETVAL
 
 
-UV sendto(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV sflags, char* name, size_t length(name), UV iflags, SV* callback)
+UV sendto(IO::Uring self, FileDescriptor fd, char* buffer, size_t length(buffer), IV sflags, char* name, size_t length(name), UV pflags, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_send(sqe, fd, buffer, STRLEN_length_of_buffer, sflags);
 	io_uring_sqe_set_flags(sqe, iflags);
+	sqe->ioprio = pflags;
 	io_uring_sqe_set_data(sqe, SvREFCNT_inc(callback));
 	RETVAL = PTR2UV(callback);
 OUTPUT:

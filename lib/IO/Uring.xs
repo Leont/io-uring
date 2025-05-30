@@ -108,9 +108,15 @@ static op_entry methods[] = {
 	{ STR_WITH_LEN("listen") },
 };
 
+struct callback {
+	SV* callback;
+};
+
 void* S_set_callback(pTHX_ struct io_uring_sqe* sqe, SV* callback) {
-	io_uring_sqe_set_data(sqe, callback ? SvREFCNT_inc(callback) : NULL);
-	return callback;
+	struct callback* callback_data = safecalloc(1, sizeof(struct callback));
+	callback_data->callback = callback ? SvREFCNT_inc(callback) : NULL;
+	io_uring_sqe_set_data(sqe, callback_data);
+	return callback_data;
 }
 #define set_callback(sqe, callback) S_set_callback(aTHX_ sqe, callback)
 
@@ -192,15 +198,17 @@ void run_once(IO::Uring self, unsigned min_events = 1)
 	EXTEND(SP, 2);
 	io_uring_for_each_cqe(&self->uring, head, cqe) {
 		++self->cqe_count;
-		SV* callback = (SV*)io_uring_cqe_get_data(cqe);
-		if (callback) {
+		struct callback* callback_data = (struct callback*)io_uring_cqe_get_data(cqe);
+		if (callback_data->callback) {
 			PUSHMARK(SP);
 			mPUSHi(cqe->res);
 			mPUSHu(cqe->flags);
 			PUTBACK;
-			call_sv(callback,  G_VOID | G_DISCARD | G_EVAL);
-			if (!(cqe->flags & IORING_CQE_F_MORE))
-				SvREFCNT_dec(callback);
+			call_sv(callback_data->callback,  G_VOID | G_DISCARD | G_EVAL);
+			if (!(cqe->flags & IORING_CQE_F_MORE)) {
+				SvREFCNT_dec(callback_data->callback);
+				Safefree(callback_data);
+			}
 
 			if (SvTRUE(ERRSV)) {
 				io_uring_cq_advance(&self->uring, self->cqe_count);
@@ -210,6 +218,8 @@ void run_once(IO::Uring self, unsigned min_events = 1)
 
 			SPAGAIN;
 		}
+		else if (!(cqe->flags & IORING_CQE_F_MORE))
+			Safefree(callback_data);
 	}
 
 	io_uring_cq_advance(&self->uring, self->cqe_count);

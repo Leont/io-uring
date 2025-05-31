@@ -1,6 +1,8 @@
 Revision history for IO-Uring
 
 {{$NEXT}}
+
+0.005     2025-05-31 02:54:06+02:00 Europe/Brussels
           - Correctly declare Alien::liburing dependency
 
 0.004     2025-05-30 16:06:44+02:00 Europe/Brussels

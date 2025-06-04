@@ -16,6 +16,7 @@ int uring_destroy(pTHX_ SV* sv, MAGIC* magic) {
 	struct ring* self = (struct ring*)magic->mg_ptr;
 	io_uring_queue_exit(&self->uring);
 	safefree(self);
+	return 0;
 }
 
 static const MGVTBL IO__Uring_magic = {

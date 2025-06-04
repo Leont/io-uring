@@ -4,6 +4,7 @@
 #include "XSUB.h"
 
 #include <liburing.h>
+#include <linux/wait.h>
 
 
 typedef struct ring {

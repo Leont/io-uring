@@ -385,7 +385,7 @@ OUTPUT:
 	RETVAL
 
 
-UV nop(IO::Uring self, const char* path, int flags, UV mode, UV iflags, SV* callback)
+UV nop(IO::Uring self, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_nop(sqe);

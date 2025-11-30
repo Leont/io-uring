@@ -133,7 +133,7 @@ void* S_set_callback(pTHX_ struct io_uring_sqe* sqe, SV* callback) {
 
 MODULE = IO::Uring				PACKAGE = IO::Uring
 
-PROTOTYPES: DISABLED
+PROTOTYPES: DISABLE
 
 BOOT:
 	HV* stash = get_hv("IO::Uring::", FALSE);

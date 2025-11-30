@@ -108,6 +108,11 @@ static op_entry methods[] = {
 	{ STR_WITH_LEN("ftruncate") },
 	{ STR_WITH_LEN("bind") },
 	{ STR_WITH_LEN("listen") },
+	{ STR_WITH_LEN("recv_zc") },
+	{ STR_WITH_LEN("epoll_wait") },
+	{ STR_WITH_LEN("readv_fixed") },
+	{ STR_WITH_LEN("writev_fixed") },
+	{ STR_WITH_LEN("pipe") },
 };
 
 struct callback {

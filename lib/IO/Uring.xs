@@ -140,6 +140,31 @@ MODULE = IO::Uring				PACKAGE = IO::Uring
 
 PROTOTYPES: DISABLE
 
+TYPEMAP: <<END
+	IO::Uring	T_MAGICEXT
+	Signal::Info	T_OPAQUEOBJ
+	Time::Spec	T_OPAQUEOBJ
+	FileDescriptor	T_FILE_DESCRIPTOR
+	DirDescriptor T_DIR_DESCRIPTOR
+	const struct sockaddr* T_PV
+
+INPUT
+T_FILE_DESCRIPTOR
+	{
+		PerlIO* ${var}_io = IoIFP(sv_2io($arg));
+		$var = ${var}_io ? PerlIO_fileno(${var}_io) : -1;
+	}
+T_DIR_DESCRIPTOR
+	if (SvOK($arg)) {
+		IO* ${var}_io = sv_2io($arg);
+		if (IoDIRP(${var}_io)) {
+			$var = dirfd(IoDIRP(${var}_io));
+		} else
+			$var = -1;
+	} else
+		$var = AT_FDCWD;
+END
+
 BOOT:
 	HV* stash = get_hv("IO::Uring::", FALSE);
 	AV* export_ok = get_av("IO::Uring::EXPORT_OK", TRUE);

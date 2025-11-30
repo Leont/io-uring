@@ -234,7 +234,7 @@ CODE:
 	HV* operations = newHV();
     for (int i = 0; i < probe->ops_len; ++i) {
 		int op = probe->ops[i].op;
-		if (op > sizeof methods / sizeof *methods)
+		if (op >= sizeof methods / sizeof *methods)
 			continue;
 		SV* value = probe->ops[i].flags & IO_URING_OP_SUPPORTED ? &PL_sv_yes : &PL_sv_no;
 		hv_store(operations, methods[i].value, methods[i].length, value, 0);

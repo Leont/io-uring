@@ -136,6 +136,8 @@ void* S_set_callback(pTHX_ struct io_uring_sqe* sqe, SV* callback) {
 #define URING_CONSTANT(cons) CONSTANT(IORING_##cons)
 #define SQE_CONSTANT(cons) CONSTANT(IOSQE_##cons)
 
+#define undef &PL_sv_undef
+
 MODULE = IO::Uring				PACKAGE = IO::Uring
 
 PROTOTYPES: DISABLE
@@ -294,7 +296,7 @@ OUTPUT:
 	RETVAL
 
 
-UV cancel(IO::Uring self, UV user_data, UV flags, UV iflags, SV* callback = &PL_sv_undef)
+UV cancel(IO::Uring self, UV user_data, UV flags, UV iflags, SV* callback = undef)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_cancel(sqe, NUM2PTR(void*, user_data), flags);
@@ -375,7 +377,7 @@ OUTPUT:
 	RETVAL
 
 
-UV link_timeout(IO::Uring self, Time::Spec ts, UV flags, UV iflags, SV* callback = &PL_sv_undef)
+UV link_timeout(IO::Uring self, Time::Spec ts, UV flags, UV iflags, SV* callback = undef)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_link_timeout(sqe, ts, flags);
@@ -589,7 +591,7 @@ OUTPUT:
 	RETVAL
 
 
-UV timeout_remove(IO::Uring self, UV user_data, UV flags, UV iflags, SV* callback = &PL_sv_undef)
+UV timeout_remove(IO::Uring self, UV user_data, UV flags, UV iflags, SV* callback = undef)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_timeout_remove(sqe, user_data, flags);

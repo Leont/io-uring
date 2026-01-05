@@ -9,7 +9,6 @@
 
 typedef struct ring {
 	struct io_uring uring;
-	unsigned cqe_count;
 } *IO__Uring;
 
 int uring_destroy(pTHX_ SV* sv, MAGIC* magic) {
@@ -27,8 +26,6 @@ static struct io_uring_sqe* S_get_sqe(pTHX_ struct ring* ring) {
 	struct io_uring_sqe* sqe = io_uring_get_sqe(&ring->uring);
 
 	if (!sqe) {
-		io_uring_cq_advance(&ring->uring, ring->cqe_count);
-		ring->cqe_count = 0;
 		io_uring_submit(&ring->uring);
 		sqe = io_uring_get_sqe(&ring->uring);
 		if (!sqe)
@@ -215,7 +212,6 @@ BOOT:
 IO::Uring new(class, UV entries)
 CODE:
 	RETVAL = safecalloc(1, sizeof(struct ring));
-	RETVAL->cqe_count = 0;
 	struct io_uring_params params = {};
 	params.flags = IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_DEFER_TASKRUN;
 	io_uring_queue_init_params(entries, &RETVAL->uring, &params);
@@ -235,23 +231,17 @@ PPCODE:
 
 	EXTEND(SP, 2);
 	io_uring_for_each_cqe(&self->uring, head, cqe) {
-		++self->cqe_count;
 		struct callback* callback_data = (struct callback*)io_uring_cqe_get_data(cqe);
+		io_uring_cqe_seen(&self->uring, cqe);
 		if (callback_data->callback) {
 			PUSHMARK(SP);
 			mPUSHi(cqe->res);
 			mPUSHu(cqe->flags);
 			PUTBACK;
-			call_sv(callback_data->callback,  G_VOID | G_DISCARD | G_EVAL);
+			call_sv(callback_data->callback,  G_VOID | G_DISCARD);
 			if (!(cqe->flags & IORING_CQE_F_MORE)) {
 				SvREFCNT_dec(callback_data->callback);
 				Safefree(callback_data);
-			}
-
-			if (SvTRUE(ERRSV)) {
-				io_uring_cq_advance(&self->uring, self->cqe_count);
-				self->cqe_count = 0;
-				Perl_croak(aTHX_ NULL);
 			}
 
 			SPAGAIN;
@@ -259,9 +249,6 @@ PPCODE:
 		else if (!(cqe->flags & IORING_CQE_F_MORE))
 			Safefree(callback_data);
 	}
-
-	io_uring_cq_advance(&self->uring, self->cqe_count);
-	self->cqe_count = 0;
 
 
 SV* probe(IO::Uring self)

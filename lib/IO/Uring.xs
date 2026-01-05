@@ -223,14 +223,14 @@ OUTPUT:
 	RETVAL
 
 
-void run_once(IO::Uring self, unsigned min_events = 1)
-	PPCODE:
-	int result = io_uring_submit_and_wait(&self->uring, min_events);
+void run_once(IO::Uring self, unsigned min_events = 1, Time::Spec timeout = NULL)
+PPCODE:
+	struct io_uring_cqe *cqe;
+	int result = io_uring_submit_and_wait_timeout(&self->uring, &cqe, min_events, timeout, NULL);
 
 	if (result == -1 && errno == EINTR)
 		PERL_ASYNC_CHECK();
 
-	struct io_uring_cqe *cqe;
 	unsigned head;
 
 	EXTEND(SP, 2);

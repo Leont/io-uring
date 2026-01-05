@@ -199,6 +199,10 @@ BOOT:
 	CONSTANT(AT_SYMLINK_FOLLOW);
 	CONSTANT(AT_REMOVEDIR);
 
+	URING_CONSTANT(POLL_UPDATE_EVENTS);
+	URING_CONSTANT(POLL_UPDATE_USER_DATA);
+	URING_CONSTANT(POLL_ADD_MULTI);
+
 	CONSTANT(P_PID);
 	CONSTANT(P_PGID);
 	CONSTANT(P_PIDFD);
@@ -464,6 +468,28 @@ CODE:
 	io_uring_prep_poll_multishot(sqe, fd, poll_mask);
 	io_uring_sqe_set_flags(sqe, iflags);
 	RETVAL = PTR2UV(set_callback(sqe, callback));
+OUTPUT:
+	RETVAL
+
+
+UV poll_update(IO::Uring self, UV old_userdata, SV* new_userdata, UV poll_mask, UV flags, UV iflags, SV* callback = undef)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_poll_update(sqe, old_userdata, 0, poll_mask, flags);
+	io_uring_sqe_set_flags(sqe, iflags);
+	void* cancel_data = set_callback(sqe, SvOK(callback) ? callback : NULL);
+	RETVAL = PTR2UV(cancel_data);
+OUTPUT:
+	RETVAL
+
+
+UV poll_remove(IO::Uring self, UV old_userdata, UV iflags, SV* callback = undef)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_poll_remove(sqe, old_userdata);
+	io_uring_sqe_set_flags(sqe, iflags);
+	void* cancel_data = set_callback(sqe, SvOK(callback) ? callback : NULL);
+	RETVAL = PTR2UV(cancel_data);
 OUTPUT:
 	RETVAL
 

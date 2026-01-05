@@ -134,6 +134,12 @@ Poll the file handle C<$fh> once. C<$mask> can have the same values as synchrono
 
 Poll the file handle C<$fh> and repeatedly call C<$callback> whenever new data is available. C<$mask> can have the same values as synchronous poll (e.g. C<POLLIN>, C<POLLOUT>).
 
+=method poll_update($id, $new_callback, $mask, $s_flags, $callback)
+
+Update the poll to have a new mask, a new callback or to make it multishot.
+
+=method poll_remove
+
 =method shutdown($fh, $how, $s_flags, $callback)
 
 Shut down a part of a connection, the same way the core builtin C<shutdown($fh, $how)> does.
@@ -346,6 +352,18 @@ If set C<fsync> will do an C<fdatasync> instead: not sync if only metadata has c
 =item * C<IORING_RECVSEND_POLL_FIRST>
 
 If set, C<io_uring> will assume the socket is currently empty and attempting to receive data will be unsuccessful. For this case, io_uring will arm internal poll and trigger a receive of the data when the socket has data to be read. This initial receive attempt can be wasteful for the case where the socket is expected to be empty, setting this flag will bypass the initial receive attempt and go straight to arming poll. If poll does indicate that data is ready to be received, the operation will proceed.
+
+=back
+
+=head3 poll_update
+
+=over 4
+
+=item * IORING_POLL_ADD_MULTI
+
+=item * IORING_POLL_UPDATE_EVENTS
+
+=item * IORING_POLL_UPDATE_USER_DATA
 
 =back
 

@@ -249,6 +249,12 @@ PPCODE:
 		else if (!(cqe->flags & IORING_CQE_F_MORE))
 			Safefree(callback_data);
 	}
+	if (result >= 0)
+		mPUSHi(result);
+	else {
+		errno = -result;
+		PUSHs(&PL_sv_undef);
+	}
 
 
 SV* probe(IO::Uring self)

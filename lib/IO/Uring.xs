@@ -213,7 +213,7 @@ IO::Uring new(class, UV entries)
 CODE:
 	RETVAL = safecalloc(1, sizeof(struct ring));
 	struct io_uring_params params = {};
-	params.flags = IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_DEFER_TASKRUN;
+	params.flags = IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_DEFER_TASKRUN | IORING_SETUP_SUBMIT_ALL;
 	io_uring_queue_init_params(entries, &RETVAL->uring, &params);
 OUTPUT:
 	RETVAL

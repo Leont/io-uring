@@ -5,6 +5,7 @@ Revision history for IO-Uring
           - Add timeout parameter to run_once
           - Allow for recursion into loop
           - Make nop callback optional
+          - Submit all entries even on errors
 
 0.007     2025-12-02 00:40:44+01:00 Europe/Brussels
           - Fix off-by-one in probe

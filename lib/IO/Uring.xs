@@ -409,12 +409,13 @@ OUTPUT:
 	RETVAL
 
 
-UV nop(IO::Uring self, UV iflags, SV* callback)
+UV nop(IO::Uring self, UV iflags, SV* callback = undef)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_nop(sqe);
 	io_uring_sqe_set_flags(sqe, iflags);
-	RETVAL = PTR2UV(set_callback(sqe, callback));
+	void* cancel_data = set_callback(sqe, SvOK(callback) ? callback : NULL);
+	RETVAL = PTR2UV(cancel_data);
 OUTPUT:
 	RETVAL
 

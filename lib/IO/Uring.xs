@@ -229,6 +229,8 @@ PPCODE:
 
 	unsigned head;
 
+	ENTER;
+	SAVETMPS;
 	EXTEND(SP, 2);
 	io_uring_for_each_cqe(&self->uring, head, cqe) {
 		struct callback* callback_data = (struct callback*)io_uring_cqe_get_data(cqe);
@@ -238,17 +240,18 @@ PPCODE:
 			mPUSHi(cqe->res);
 			mPUSHu(cqe->flags);
 			PUTBACK;
-			call_sv(callback_data->callback,  G_VOID | G_DISCARD);
+			call_sv(callback_data->callback,  G_VOID);
 			if (!(cqe->flags & IORING_CQE_F_MORE)) {
 				SvREFCNT_dec(callback_data->callback);
 				Safefree(callback_data);
 			}
-
 			SPAGAIN;
+			FREETMPS;
 		}
 		else if (!(cqe->flags & IORING_CQE_F_MORE))
 			Safefree(callback_data);
 	}
+	LEAVE;
 	if (result >= 0)
 		mPUSHi(result);
 	else {

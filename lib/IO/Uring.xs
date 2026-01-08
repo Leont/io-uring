@@ -11,7 +11,7 @@ typedef struct ring {
 	struct io_uring uring;
 } *IO__Uring;
 
-int uring_destroy(pTHX_ SV* sv, MAGIC* magic) {
+static int uring_destroy(pTHX_ SV* sv, MAGIC* magic) {
 	struct ring* self = (struct ring*)magic->mg_ptr;
 	io_uring_queue_exit(&self->uring);
 	safefree(self);
@@ -116,7 +116,7 @@ struct callback {
 	SV* callback;
 };
 
-void* S_set_callback(pTHX_ struct io_uring_sqe* sqe, SV* callback) {
+static void* S_set_callback(pTHX_ struct io_uring_sqe* sqe, SV* callback) {
 	struct callback* callback_data = safecalloc(1, sizeof(struct callback));
 	callback_data->callback = callback ? SvREFCNT_inc(callback) : NULL;
 	io_uring_sqe_set_data(sqe, callback_data);

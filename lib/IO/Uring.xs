@@ -625,12 +625,13 @@ OUTPUT:
 	RETVAL
 
 
-UV timeout_update(IO::Uring self, Time::Spec ts, UV user_data, UV flags, UV iflags, SV* callback)
+UV timeout_update(IO::Uring self, Time::Spec ts, UV user_data, UV flags, UV iflags, SV* callback = undef)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_timeout_update(sqe, ts, user_data, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
-	RETVAL = PTR2UV(set_callback(sqe, callback));
+	void* cancel_data = set_callback(sqe, SvOK(callback) ? callback : NULL);
+	RETVAL = PTR2UV(cancel_data);
 OUTPUT:
 	RETVAL
 

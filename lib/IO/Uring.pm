@@ -68,6 +68,10 @@ Submit all pending requests, and process at least C<$min_events> completed (but 
 
 This probes for which features are supported on this system. It returns a hash of feature-name to true/false. Generally speaking feature names map directly to method names but note that for filesystem operations you should check for the C<*at> version (e.g. C<'openat'> not C<'open'>).
 
+=method ensure_sqes($count)
+
+This ensures the availability of a certain number of sqes. This is useful when creating linked chains.
+
 =method accept($sock, $flags, $s_flags, $callback)
 
 Accept a new socket from listening socket C<$sock>.

@@ -288,6 +288,14 @@ CODE:
 OUTPUT:
 	RETVAL
 
+
+void ensure_sqes(IO::Uring ring, UV wanted)
+CODE:
+	unsigned space_left = io_uring_sq_space_left(&ring->uring);
+	if (space_left < wanted)
+		io_uring_submit(&ring->uring);
+
+
 UV accept(IO::Uring self, FileDescriptor fd, UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);

@@ -209,11 +209,23 @@ BOOT:
 	CONSTANT(WCONTINUED);
 	CONSTANT(WNOWAIT);
 
-IO::Uring new(class, UV entries)
+IO::Uring new(class, UV entries, ...)
 CODE:
 	RETVAL = safecalloc(1, sizeof(struct ring));
 	struct io_uring_params params = {};
 	params.flags = IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_DEFER_TASKRUN | IORING_SETUP_SUBMIT_ALL;
+	for (int current = 2; current + 1 < items; items += 2) {
+		STRLEN key_length;
+		const char* key = SvPV(ST(current), key_length);
+		if (key_length == 11 && strEQ(key, "cqe_entries")) {
+			params.flags |= IORING_SETUP_CQSIZE;
+			params.cq_entries = SvIV(ST(current+1));
+		} else if (key_length == 6 && strEQ(key, "sqpoll")) {
+			params.flags |= IORING_SETUP_SQPOLL;
+			params.sq_thread_idle = SvIV(ST(current + 1));
+		} else
+			warn("Unknown named argument '%s'", key);
+	}
 	io_uring_queue_init_params(entries, &RETVAL->uring, &params);
 OUTPUT:
 	RETVAL

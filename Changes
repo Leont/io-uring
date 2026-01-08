@@ -3,6 +3,7 @@ Revision history for IO-Uring
 {{$NEXT}}
           - Give run_once a return value
           - Allow absent callback on timeout_update
+          - Add cqe_entries and sqpoll options to constructor
 
 0.008     2026-01-06 23:55:21+01:00 Europe/Brussels
           - Add poll_update and poll_remove

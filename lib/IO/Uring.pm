@@ -44,9 +44,21 @@ All event methods return an identifier that can be used with C<cancel>.
 
 B<Note>: This is an early release and this module should still be regarded as experimental. Backwards compatibility is not yet guaranteed.
 
-=method new($queue_size)
+=method new($queue_size, %named_arguments)
 
-Create a new uring object, with the given submission queue size.
+Create a new uring object, with the given submission queue size. It takes the following optional named arguments:
+
+=over 4
+
+=item * cqe_entries
+
+The number of entries in the completion queue. It defaults to twice the size of the submission queue.
+
+=item * sqpoll
+
+This enables sqpoll mode, starting a kernel thread to poll for submissions so no system calls can be avoided. The value is the sq thread idle time in milliseconds.
+
+=back
 
 =method run_once($min_events = 1)
 

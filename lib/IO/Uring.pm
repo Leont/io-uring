@@ -64,6 +64,10 @@ This enables sqpoll mode, starting a kernel thread to poll for submissions so no
 
 Submit all pending requests, and process at least C<$min_events> completed (but up to C<$queue_size>) events.
 
+=method submit()
+
+This submits the next events to the submission queue without processing completion events.
+
 =method probe()
 
 This probes for which features are supported on this system. It returns a hash of feature-name to true/false. Generally speaking feature names map directly to method names but note that for filesystem operations you should check for the C<*at> version (e.g. C<'openat'> not C<'open'>).

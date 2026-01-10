@@ -272,6 +272,19 @@ PPCODE:
 	}
 
 
+SV* submit(IO::Uring self)
+CODE:
+	int result = io_uring_submit(&self->uring);
+	if (result >= 0)
+		RETVAL = newSViv(result);
+	else {
+		errno = -result;
+		RETVAL = &PL_sv_undef;
+	}
+OUTPUT:
+	RETVAL
+
+
 SV* probe(IO::Uring self)
 CODE:
 	struct io_uring_probe* probe = io_uring_get_probe_ring(&self->uring);

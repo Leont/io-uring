@@ -1,6 +1,7 @@
 Revision history for IO-Uring
 
 {{$NEXT}}
+          - Add submit method
 
 0.009     2026-01-09 01:57:53+01:00 Europe/Brussels
           - Give run_once a return value

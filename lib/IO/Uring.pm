@@ -84,6 +84,10 @@ This adds a L<buffer group|IO::Uring::BufferGroup> to the ring, and returns it. 
 
 Accept a new socket from listening socket C<$sock>.
 
+=method accept_multishot($sock, $flags, $s_flags, $callback)
+
+Accept a new socket from listening socket C<$sock>. Unlike C<accept> this will trigger more than once. For each completion event posted on behalf of this request, the flags argument will have IORING_CQE_F_MORE set if the application should expect more completions from this request. If this flag isn't set, then that signifies termination of the multishot accept.
+
 =method bind($sock, $sockaddr, $s_flags, $callback)
 
 Bind the socket C<$sock> to C<$sockaddr>.

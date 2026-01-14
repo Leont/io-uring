@@ -348,6 +348,16 @@ OUTPUT:
 	RETVAL
 
 
+UV accept_multishot(IO::Uring self, FileDescriptor fd, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_multishot_accept(sqe, fd, NULL, NULL, SOCK_CLOEXEC);
+	io_uring_sqe_set_flags(sqe, iflags);
+	RETVAL = PTR2UV(set_callback(sqe, callback));
+OUTPUT:
+	RETVAL
+
+
 UV bind(IO::Uring self, FileDescriptor fd, const char* sockaddr, size_t length(sockaddr), UV iflags, SV* callback)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);

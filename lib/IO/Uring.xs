@@ -255,7 +255,12 @@ CODE:
 		} else
 			warn("Unknown named argument '%s'", key);
 	}
-	io_uring_queue_init_params(entries, &RETVAL->uring, &params);
+	int ret = io_uring_queue_init_params(entries, &RETVAL->uring, &params);
+
+	if (ret) {
+		safefree(RETVAL);
+		Perl_croak(aTHX_ "Could not create ring: %s", strerror(-ret));
+	}
 OUTPUT:
 	RETVAL
 

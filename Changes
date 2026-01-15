@@ -5,6 +5,7 @@ Revision history for IO-Uring
           - Add read_multishot and recv_multishot
           - Add accept_multishot
           - Replace ensure_sqes with sq_space_left
+          - Add error checking to constructor
 
 0.009     2026-01-09 01:57:53+01:00 Europe/Brussels
           - Give run_once a return value

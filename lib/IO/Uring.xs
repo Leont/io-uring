@@ -541,7 +541,7 @@ OUTPUT:
 	RETVAL
 
 
-UV poll_update(IO::Uring self, UV old_userdata, SV* new_userdata, UV poll_mask, UV flags, UV iflags, SV* callback = undef)
+UV poll_update(IO::Uring self, UV old_userdata, new_userdata, UV poll_mask, UV flags, UV iflags, SV* callback = undef)
 CODE:
 	struct io_uring_sqe* sqe = get_sqe(self);
 	io_uring_prep_poll_update(sqe, old_userdata, 0, poll_mask, flags);

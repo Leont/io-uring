@@ -331,11 +331,11 @@ OUTPUT:
 	RETVAL
 
 
-void ensure_sqes(IO::Uring ring, UV wanted)
+UV sq_space_left(IO::Uring ring)
 CODE:
-	unsigned space_left = io_uring_sq_space_left(&ring->uring);
-	if (space_left < wanted)
-		io_uring_submit(&ring->uring);
+	RETVAL = io_uring_sq_space_left(&ring->uring);
+OUTPUT:
+	RETVAL
 
 
 UV accept(IO::Uring self, FileDescriptor fd, UV iflags, SV* callback)

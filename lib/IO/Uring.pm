@@ -72,9 +72,9 @@ This submits the next events to the submission queue without processing completi
 
 This probes for which features are supported on this system. It returns a hash of feature-name to true/false. Generally speaking feature names map directly to method names but note that for filesystem operations you should check for the C<*at> version (e.g. C<'openat'> not C<'open'>).
 
-=method ensure_sqes($count)
+=method sq_space_left($count)
 
-This ensures the availability of a certain number of sqes. This is useful when creating linked chains.
+Return the available space on the submission queue.
 
 =method add_buffer_group($size, $count, $id = 0)
 

@@ -248,11 +248,11 @@ Remove a timeout identified by C<$id>. C<$flags> is currently unused and must be
 
 Update the timer identifiers by C<$id>. C<timespec> and C<flags> have the same meaning as in C<timeout>.
 
-=method unlink($path, $mode, $s_flags, $callback)
+=method unlink($path, $flags, $s_flags, $callback)
 
 Remove a file or directory at C<$path> with flags C<$flags>.
 
-=method unlinkat($dirhandle, $path, $mode, $s_flags, $callback)
+=method unlinkat($dirhandle, $path, $flags, $s_flags, $callback)
 
 Remove a file or directory at C<$path> under C<$dirhandle> with flags C<$flags>.
 

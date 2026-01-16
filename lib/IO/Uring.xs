@@ -152,6 +152,8 @@ static const MGVTBL IO__Uring__BufferGroup_magic = {
 	.svt_free = buffergroup_free,
 };
 
+#define CLONE_SKIP(sv) 1
+
 #undef SvPV
 #define SvPV(sv, len) SvPVbyte(sv, len)
 #undef SvPV_nolen
@@ -263,6 +265,9 @@ CODE:
 	}
 OUTPUT:
 	RETVAL
+
+
+IV CLONE_SKIP(sv)
 
 
 void run_once(IO::Uring self, unsigned min_events = 1, Time::Spec timeout = NULL, sigset_t* sigmask = NULL)
@@ -817,6 +822,9 @@ CLEANUP:
 
 
 MODULE = IO::Uring				PACKAGE = IO::Uring::BufferGroup
+
+
+IV CLONE_SKIP(sv)
 
 
 SV* get(IO::Uring::BufferGroup self, UV index, size_t size)

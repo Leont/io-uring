@@ -265,10 +265,10 @@ OUTPUT:
 	RETVAL
 
 
-void run_once(IO::Uring self, unsigned min_events = 1, Time::Spec timeout = NULL)
+void run_once(IO::Uring self, unsigned min_events = 1, Time::Spec timeout = NULL, sigset_t* sigmask = NULL)
 PPCODE:
 	struct io_uring_cqe *cqe;
-	int result = io_uring_submit_and_wait_timeout(&self->uring, &cqe, min_events, timeout, NULL);
+	int result = io_uring_submit_and_wait_timeout(&self->uring, &cqe, min_events, timeout, sigmask);
 
 	if (result == -1 && errno == EINTR)
 		PERL_ASYNC_CHECK();

@@ -60,9 +60,9 @@ This enables sqpoll mode, starting a kernel thread to poll for submissions so no
 
 =back
 
-=method run_once($min_events = 1)
+=method run_once($min_events = 1, $timeout = undef, $signal_mask = undef)
 
-Submit all pending requests, and process at least C<$min_events> completed (but up to C<$queue_size>) events.
+Submit all pending requests, and process at least C<$min_events> completed (but up to C<$queue_size>) events, or if $timeout (a Time::Spec object) is defined until that much time has passed. If C<$signal_mask> (a POSIX::SigSet object) is defined, the signal mask will temporalily and atomicly set to it during the waiting.
 
 =method submit()
 

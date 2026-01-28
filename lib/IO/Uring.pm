@@ -162,11 +162,13 @@ Poll the file handle C<$fh> once. C<$mask> can have the same values as synchrono
 
 Poll the file handle C<$fh> and repeatedly call C<$callback> whenever new data is available. C<$mask> can have the same values as synchronous poll (e.g. C<POLLIN>, C<POLLOUT>).
 
-=method poll_update($id, $new_callback, $mask, $s_flags, $callback)
+=method poll_update($id, $new_callback, $mask, $flags, $s_flags, $callback)
 
-Update the poll to have a new mask, a new callback or to make it multishot.
+Update the poll to have a new mask or setting flags to make it multishot. Setting a new callback is currently not yet supported.
 
-=method poll_remove
+=method poll_remove($id, $s_flags, $callback = undef)
+
+Remove the poll with id C<$id>.
 
 =method shutdown($fh, $how, $s_flags, $callback)
 
@@ -244,7 +246,7 @@ Create a timeout. C<$timespec> must refer to a L<Time::Spec|Time::Spec> object t
 
 Remove a timeout identified by C<$id>. C<$flags> is currently unused and must be C<0>. Like C<cancel> and C<link_timeout>, the callback is optional.
 
-=method timeout_update($id, $timespec, $flags, $s_flags, $callback)
+=method timeout_update($timespec, $id, $flags, $s_flags, $callback)
 
 Update the timer identifiers by C<$id>. C<timespec> and C<flags> have the same meaning as in C<timeout>.
 

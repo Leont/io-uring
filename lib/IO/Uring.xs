@@ -245,7 +245,7 @@ CODE:
 	RETVAL = safecalloc(1, sizeof(struct ring));
 	struct io_uring_params params = {};
 	params.flags = IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_COOP_TASKRUN | IORING_SETUP_DEFER_TASKRUN | IORING_SETUP_SUBMIT_ALL;
-	for (int current = 2; current + 1 < items; items += 2) {
+	for (int current = 2; current + 1 < items; current += 2) {
 		STRLEN key_length;
 		const char* key = SvPV(ST(current), key_length);
 		if (key_length == 11 && strEQ(key, "cqe_entries")) {

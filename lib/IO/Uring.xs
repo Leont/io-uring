@@ -333,7 +333,7 @@ CODE:
 		if (op >= sizeof methods / sizeof *methods)
 			continue;
 		SV* value = probe->ops[i].flags & IO_URING_OP_SUPPORTED ? &PL_sv_yes : &PL_sv_no;
-		hv_store(operations, methods[i].value, methods[i].length, value, 0);
+		hv_store(operations, methods[op].value, methods[op].length, value, 0);
 	}
 	io_uring_free_probe(probe);
 	RETVAL = newRV_noinc((SV*)operations);

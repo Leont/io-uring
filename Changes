@@ -2,6 +2,7 @@ Revision history for IO-Uring
 
 {{$NEXT}}
           - Correct iteration over named arguments to new
+          - Store correct name when probing
 
 0.010     2026-01-17 21:22:33+01:00 Europe/Brussels
           - Add submit method

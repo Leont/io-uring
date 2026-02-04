@@ -1,6 +1,7 @@
 Revision history for IO-Uring
 
 {{$NEXT}}
+          - Keep more arguments alive
           - Correct iteration over named arguments to new
           - Store correct name when probing
 

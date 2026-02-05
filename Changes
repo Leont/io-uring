@@ -1,6 +1,8 @@
 Revision history for IO-Uring
 
 {{$NEXT}}
+
+0.011     2026-02-05 18:19:20+01:00 Europe/Brussels
           - Keep more arguments alive
           - Correct iteration over named arguments to new
           - Store correct name when probing

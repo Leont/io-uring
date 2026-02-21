@@ -1,6 +1,7 @@
 Revision history for IO-Uring
 
 {{$NEXT}}
+          - Add statx and fstatx functions
 
 0.011     2026-02-05 18:19:20+01:00 Europe/Brussels
           - Keep more arguments alive

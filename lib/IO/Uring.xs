@@ -41,6 +41,7 @@ typedef int FileDescriptor;
 typedef int DirDescriptor;
 typedef siginfo_t* Signal__Info;
 typedef struct __kernel_timespec* Time__Spec;
+typedef struct statx* File__StatX;
 
 typedef struct {
 	const char* value;
@@ -178,6 +179,7 @@ TYPEMAP: <<END
 	IO::Uring::BufferGroup	T_MAGICEXT
 	Signal::Info	T_OPAQUEOBJ
 	Time::Spec	T_OPAQUEOBJ
+	File::StatX T_OPAQUEOBJ
 	FileDescriptor	T_FILE_DESCRIPTOR
 	DirDescriptor T_DIR_DESCRIPTOR
 	const struct sockaddr* T_PV
@@ -428,6 +430,16 @@ CODE:
 	io_uring_prep_fallocate(sqe, fd, 0, offset, length);
 	io_uring_sqe_set_flags(sqe, iflags);
 	RETVAL = PTR2UV(set_callback(sqe, callback, NULL, NULL));
+OUTPUT:
+	RETVAL
+
+
+UV fstatx(IO::Uring self, FileDescriptor fd, int flags, unsigned mask, File::StatX stat, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_statx(sqe, fd, "", flags | AT_EMPTY_PATH, mask, stat);
+	io_uring_sqe_set_flags(sqe, iflags);
+	RETVAL = PTR2UV(set_callback(sqe, callback, ST(4), NULL));
 OUTPUT:
 	RETVAL
 
@@ -701,6 +713,16 @@ CODE:
 	io_uring_prep_splice(sqe, in, off_in, out, off_out, nbytes, flags);
 	io_uring_sqe_set_flags(sqe, iflags);
 	RETVAL = PTR2UV(set_callback(sqe, callback, NULL, NULL));
+OUTPUT:
+	RETVAL
+
+
+UV statx(IO::Uring self, DirDescriptor dir, const char* path, int flags, unsigned mask, File::StatX stat, UV iflags, SV* callback)
+CODE:
+	struct io_uring_sqe* sqe = get_sqe(self);
+	io_uring_prep_statx(sqe, dir, path, flags, mask, stat);
+	io_uring_sqe_set_flags(sqe, iflags);
+	RETVAL = PTR2UV(set_callback(sqe, callback, ST(2), ST(5)));
 OUTPUT:
 	RETVAL
 

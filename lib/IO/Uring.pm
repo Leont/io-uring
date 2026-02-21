@@ -108,6 +108,10 @@ Connect socket C<$sock> to address C<$sockaddr>.
 
 Allocate disk space in C<$fh> for C<$offset> and C<$length>.
 
+=method fstatx($fh, $flags, $mask, $stat, $s_flags, $callback)
+
+This stats the filehandle C<$fh>, with C<$flags> and C<$mask>. This is analogous to C<fstatx> in L<File::StatX|File::StatX>. C<$stat> should be an empty C<File::Stat> object and will contain the result of the operation if successful.
+
 =method fsync($fh, $flags, $s_flags, $callback)
 
 Synchronize a file's in-core state with its storage device. C<flags> may be C<0> or C<IORING_FSYNC_DATASYNC>.
@@ -230,6 +234,10 @@ Send a buffer to a specific address. The buffer and address must be kept alive, 
 =method socket($domain, $type, $protocol, $flags, $s_flags, $callback)
 
 Create a new socket of the given C<$domain>, C<$type> and C<$protocol>.
+
+=method statx($dir, $path, $flags, $mask, $stat, $s_flags, $callback)
+
+This stats the file C<$path> under C<$dir> (a dirhandle that may be undef for the current directory), with C<$flags> and C<$mask>. This is analogous to C<statx>/C<statxat> in L<File::StatX|File::StatX>. C<$stat> should be an empty C<File::Stat> object and will contain the result of the operation if successful.
 
 =method tee($fh_in, $fh_out, $nbytes, $flags, $callback)
 

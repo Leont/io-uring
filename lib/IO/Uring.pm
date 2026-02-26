@@ -36,7 +36,7 @@ The submission flags. In particular this allows you to chain actions.
 
 =item 2.
 
-A callback. This callback receives two integer arguments: a result (on error typically a negative errno value), and the completion flags. This callback will be kept alive by this module; any other resources that need to be kept alive should be captured by it.
+A callback. This callback receives two integer arguments: a result (on error typically a negative errno value), and the completion flags.
 
 =back
 
@@ -134,7 +134,7 @@ Link the file at C<$new_path> in C<$new_dir> (a directory handle) to C<$old_path
 
 =method link_timeout($time_spec, $flags, $s_flags, $callback = undef)
 
-Prepare a timeout request for linked submissions (using the C<IOSQE_IO_LINK>/C<IOSQE_IO_HARDLINK> submission flags). C<$timespec> must refer to a L<Time::Spec|Time::Spec> object that must be kept alive until submission (usually through the callback). C<$flags> is a bit set that may contain any of the following values: C<IORING_TIMEOUT_ABS>, C<IORING_TIMEOUT_BOOTTIME>, C<IORING_TIMEOUT_REALTIME>, C<IORING_TIMEOUT_ETIME_SUCCESS>, C<IORING_TIMEOUT_MULTISHOT>.
+Prepare a timeout request for linked submissions (using the C<IOSQE_IO_LINK>/C<IOSQE_IO_HARDLINK> submission flags). C<$timespec> must refer to a L<Time::Spec|Time::Spec> object. C<$flags> is a bit set that may contain any of the following values: C<IORING_TIMEOUT_ABS>, C<IORING_TIMEOUT_BOOTTIME>, C<IORING_TIMEOUT_REALTIME>, C<IORING_TIMEOUT_ETIME_SUCCESS>, C<IORING_TIMEOUT_MULTISHOT>.
 
 Like C<cancel> and C<timeout_remove>, the C<$callback> is optional.
 
@@ -197,7 +197,7 @@ Synchronize the given range to disk. C<$flags> must currently be C<0>.
 
 =method read($fh, $buffer, $offset, $s_flags, $callback)
 
-Equivalent to C<pread($fh, $buffer, $offset)>. The buffer must be preallocated to the desired size, the callback received the number of bytes in it that are actually written to. The buffer must be kept alive, typically by enclosing over it in the callback.
+Equivalent to C<pread($fh, $buffer, $offset)>. The buffer must be preallocated to the desired size, the callback received the number of bytes in it that are actually written to.
 
 =method read_multishot($fh, $nbytes, $offset, $buffer_group, $s_flags, $callback)
 
@@ -207,7 +207,7 @@ A multishot request will persist as long as no errors are encountered doing hand
 
 =method recv($sock, $buffer, $flags, $pflags, $s_flags, $callback)
 
-Equivalent to C<recv($fh, $buffer, $flags)>. The buffer must be preallocated to the desired size, the callback received the number of bytes in it that are actually written to. The buffer must be kept alive, typically by enclosing over it in the callback.
+Equivalent to C<recv($fh, $buffer, $flags)>. The buffer must be preallocated to the desired size, the callback received the number of bytes in it that are actually written to.
 
 =method recv_multishot($sock, $flags, $pflags, $s_flags, $callback)
 
@@ -225,11 +225,11 @@ Rename the file at C<$old_path> in C<$old_dir> (a directory handle) to C<$new_pa
 
 =method send($sock, $buffer, $flags, $pflags, $s_flags, $callback)
 
-Equivalent to C<send($fh, $buffer, $flags)>. The buffer must be kept alive, typically by enclosing over it in the callback.
+Equivalent to C<send($fh, $buffer, $flags)>.
 
 =method sendto($sock, $buffer, $flags, $sockaddr, $pflags, $s_flags, $callback)
 
-Send a buffer to a specific address. The buffer and address must be kept alive, typically by enclosing over it in the callback.
+Send a buffer to a specific address.
 
 =method socket($domain, $type, $protocol, $flags, $s_flags, $callback)
 
@@ -248,7 +248,7 @@ flags for the operation and must currently be C<0>.
 
 =method timeout($timespec, $count, $flags, $s_flags, $callback)
 
-Create a timeout. C<$timespec> must refer to a L<Time::Spec|Time::Spec> object that must be kept alive through the callback. C<$count> is the number of events that should be waited on, typically it would be C<0>. C<$flags> is a bit set that may contain any of the following values: C<IORING_TIMEOUT_ABS>, C<IORING_TIMEOUT_BOOTTIME>, C<IORING_TIMEOUT_REALTIME>, C<IORING_TIMEOUT_ETIME_SUCCESS>, C<IORING_TIMEOUT_MULTISHOT>.
+Create a timeout. C<$timespec> must refer to a L<Time::Spec|Time::Spec> object. C<$count> is the number of events that should be waited on, typically it would be C<0>. C<$flags> is a bit set that may contain any of the following values: C<IORING_TIMEOUT_ABS>, C<IORING_TIMEOUT_BOOTTIME>, C<IORING_TIMEOUT_REALTIME>, C<IORING_TIMEOUT_ETIME_SUCCESS>, C<IORING_TIMEOUT_MULTISHOT>.
 
 =method timeout_remove($id, $flags, $s_flags, $callback = undef)
 
@@ -268,11 +268,11 @@ Remove a file or directory at C<$path> under C<$dirhandle> with flags C<$flags>.
 
 =method waitid($id_type, $id, $info, $options, $flags, $s_flags, $callback)
 
-Wait for another process. C<$id_type> specifies the type of ID used and must be one of C<P_PID> (C<$id> is a PID), C<P_PGID> (C<$id> is a process group), C<P_PIDFD> (C<$id> is a PID fd) or C<P_ALL> (C<$id> is ignored, wait for any child). C<$info> must be a L<Signal::Info|Signal::Info> object that must be kept alive through the callback, it will contain the result of the event. C<$options> is a bitset of C<WEXITED>, C<WSTOPPED> C<WCONTINUED>, C<WNOWAIT>; typically it would be C<WEXITED>. C<$flags> is currently unused and must be C<0>. When the callback is triggered the following entries of C<$info> will be set: C<pid>, C<uid>, C<signo> (will always be C<SIGCHLD>), C<status> and C<code> (C<CLD_EXITED>, C<CLD_KILLED>)
+Wait for another process. C<$id_type> specifies the type of ID used and must be one of C<P_PID> (C<$id> is a PID), C<P_PGID> (C<$id> is a process group), C<P_PIDFD> (C<$id> is a PID fd) or C<P_ALL> (C<$id> is ignored, wait for any child). C<$info> must be a L<Signal::Info|Signal::Info> object that will contain the result of the event. C<$options> is a bitset of C<WEXITED>, C<WSTOPPED> C<WCONTINUED>, C<WNOWAIT>; typically it would be C<WEXITED>. C<$flags> is currently unused and must be C<0>. When the callback is triggered the following entries of C<$info> will be set: C<pid>, C<uid>, C<signo> (will always be C<SIGCHLD>), C<status> and C<code> (C<CLD_EXITED>, C<CLD_KILLED>)
 
 =method write($fh, $buffer, $offset, $s_flags, $callback)
 
-Equivalent to C<send($fh, $buffer, $flags)>. The buffer must be kept alive, typically by enclosing over it in the callback.
+Equivalent to C<send($fh, $buffer, $flags)>.
 
 =head1 FLAGS
 

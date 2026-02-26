@@ -1,6 +1,8 @@
 Revision history for IO-Uring
 
 {{$NEXT}}
+
+0.012     2026-02-26 18:52:42+01:00 Europe/Brussels
           - Add statx and fstatx functions
 
 0.011     2026-02-05 18:19:20+01:00 Europe/Brussels

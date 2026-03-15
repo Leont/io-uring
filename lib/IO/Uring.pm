@@ -72,19 +72,35 @@ This submits the next events to the submission queue without processing completi
 
 This probes for which features are supported on this system. It returns a hash of feature-name to true/false. Generally speaking feature names map directly to method names but note that for filesystem operations you should check for the C<*at> version (e.g. C<'openat'> not C<'open'>).
 
-=method sq_space_left($count)
+=method sq_space_left()
 
 Return the available space on the submission queue.
 
-=method add_buffer_group($size, $count, $id = 0)
+=method add_buffer_group($size, $count, $id = 0, $flags = 0)
 
-This adds a L<buffer group|IO::Uring::BufferGroup> to the ring, and returns it. It will have C<$count> buffers each C<$size> bytes; both numbers must be powers-of-two.
+Create and register a L<buffer group|IO::Uring::BufferGroup> with the ring.
 
-=method accept($sock, $flags, $s_flags, $callback)
+The buffer group contains C<$count> preallocated buffers of C<$size> bytes
+each. Both values must be powers of two.
+
+Buffer groups are primarily used with multishot receive operations such as
+C<recv_multishot> and C<read_multishot>. Instead of supplying a buffer from
+user space for each request, the kernel selects a buffer from the group
+whenever data arrives.
+
+When a completion occurs, the callback receives the result and completion
+flags as usual, and the buffer that was used for the operation can be
+retrieved from the buffer group object. After the callback finishes, the
+buffer is returned to the group so it can be reused for future operations.
+
+Using provided buffers avoids repeated memory allocation and allows
+multishot operations to efficiently deliver multiple completions.
+
+=method accept($sock, $s_flags, $callback)
 
 Accept a new socket from listening socket C<$sock>.
 
-=method accept_multishot($sock, $flags, $s_flags, $callback)
+=method accept_multishot($sock, $s_flags, $callback)
 
 Accept a new socket from listening socket C<$sock>. Unlike C<accept> this will trigger more than once. For each completion event posted on behalf of this request, the flags argument will have IORING_CQE_F_MORE set if the application should expect more completions from this request. If this flag isn't set, then that signifies termination of the multishot accept.
 
@@ -120,7 +136,7 @@ Synchronize a file's in-core state with its storage device. C<flags> may be C<0>
 
 Truncate C<$fh> to length C<$length>.
 
-=method listen($fh, $count)
+=method listen($fh, $count, $s_flags, $callback)
 
 Mark the socket referred to by C<$fh> as a passive socket, that is, as a socket that will be used to C<accept> incoming connection requests using accept(2). C<$count> is the maximum backlog site for pending connections.
 
@@ -209,7 +225,7 @@ A multishot request will persist as long as no errors are encountered doing hand
 
 Equivalent to C<recv($fh, $buffer, $flags)>. The buffer must be preallocated to the desired size, the callback received the number of bytes in it that are actually written to.
 
-=method recv_multishot($sock, $flags, $pflags, $s_flags, $callback)
+=method recv_multishot($sock, $flags, $pflags, $buffer_group, $s_flags, $callback)
 
 This receives like C<recv> does, but will repeatedly trigger whenever data becomes available. It must be used with provided buffers, the appropriate buffer group is passed in C<$buffer_group>.
 
@@ -239,7 +255,7 @@ Create a new socket of the given C<$domain>, C<$type> and C<$protocol>.
 
 This stats the file C<$path> under C<$dir> (a dirhandle that may be undef for the current directory), with C<$flags> and C<$mask>. This is analogous to C<statx>/C<statxat> in L<File::StatX|File::StatX>. C<$stat> should be an empty C<File::Stat> object and will contain the result of the operation if successful.
 
-=method tee($fh_in, $fh_out, $nbytes, $flags, $callback)
+=method tee($fh_in, $fh_out, $nbytes, $flags, $s_flags, $callback)
 
 Prepare a tee request. This will use as input the file
 handle C<$fh_in> and as output the file handle C<$fh_out>

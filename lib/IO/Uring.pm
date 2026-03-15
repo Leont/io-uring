@@ -83,19 +83,6 @@ Create and register a L<buffer group|IO::Uring::BufferGroup> with the ring.
 The buffer group contains C<$count> preallocated buffers of C<$size> bytes
 each. Both values must be powers of two.
 
-Buffer groups are primarily used with multishot receive operations such as
-C<recv_multishot> and C<read_multishot>. Instead of supplying a buffer from
-user space for each request, the kernel selects a buffer from the group
-whenever data arrives.
-
-When a completion occurs, the callback receives the result and completion
-flags as usual, and the buffer that was used for the operation can be
-retrieved from the buffer group object. After the callback finishes, the
-buffer is returned to the group so it can be reused for future operations.
-
-Using provided buffers avoids repeated memory allocation and allows
-multishot operations to efficiently deliver multiple completions.
-
 =method accept($sock, $s_flags, $callback)
 
 Accept a new socket from listening socket C<$sock>.

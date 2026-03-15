@@ -72,19 +72,19 @@ This submits the next events to the submission queue without processing completi
 
 This probes for which features are supported on this system. It returns a hash of feature-name to true/false. Generally speaking feature names map directly to method names but note that for filesystem operations you should check for the C<*at> version (e.g. C<'openat'> not C<'open'>).
 
-=method sq_space_left($count)
+=method sq_space_left()
 
 Return the available space on the submission queue.
 
-=method add_buffer_group($size, $count, $id = 0)
+=method add_buffer_group($size, $count, $id = 0, $flags = 0)
 
 This adds a L<buffer group|IO::Uring::BufferGroup> to the ring, and returns it. It will have C<$count> buffers each C<$size> bytes; both numbers must be powers-of-two.
 
-=method accept($sock, $flags, $s_flags, $callback)
+=method accept($sock, $s_flags, $callback)
 
 Accept a new socket from listening socket C<$sock>.
 
-=method accept_multishot($sock, $flags, $s_flags, $callback)
+=method accept_multishot($sock, $s_flags, $callback)
 
 Accept a new socket from listening socket C<$sock>. Unlike C<accept> this will trigger more than once. For each completion event posted on behalf of this request, the flags argument will have IORING_CQE_F_MORE set if the application should expect more completions from this request. If this flag isn't set, then that signifies termination of the multishot accept.
 
@@ -120,7 +120,7 @@ Synchronize a file's in-core state with its storage device. C<flags> may be C<0>
 
 Truncate C<$fh> to length C<$length>.
 
-=method listen($fh, $count)
+=method listen($fh, $count, $s_flags, $callback)
 
 Mark the socket referred to by C<$fh> as a passive socket, that is, as a socket that will be used to C<accept> incoming connection requests using accept(2). C<$count> is the maximum backlog site for pending connections.
 
@@ -239,7 +239,7 @@ Create a new socket of the given C<$domain>, C<$type> and C<$protocol>.
 
 This stats the file C<$path> under C<$dir> (a dirhandle that may be undef for the current directory), with C<$flags> and C<$mask>. This is analogous to C<statx>/C<statxat> in L<File::StatX|File::StatX>. C<$stat> should be an empty C<File::Stat> object and will contain the result of the operation if successful.
 
-=method tee($fh_in, $fh_out, $nbytes, $flags, $callback)
+=method tee($fh_in, $fh_out, $nbytes, $flags, $s_flags, $callback)
 
 Prepare a tee request. This will use as input the file
 handle C<$fh_in> and as output the file handle C<$fh_out>

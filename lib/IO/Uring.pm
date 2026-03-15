@@ -209,7 +209,7 @@ A multishot request will persist as long as no errors are encountered doing hand
 
 Equivalent to C<recv($fh, $buffer, $flags)>. The buffer must be preallocated to the desired size, the callback received the number of bytes in it that are actually written to.
 
-=method recv_multishot($sock, $flags, $pflags, $s_flags, $callback)
+=method recv_multishot($sock, $flags, $pflags, $buffer_group, $s_flags, $callback)
 
 This receives like C<recv> does, but will repeatedly trigger whenever data becomes available. It must be used with provided buffers, the appropriate buffer group is passed in C<$buffer_group>.
 

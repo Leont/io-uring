@@ -2,6 +2,7 @@ Revision history for IO-Uring
 
 {{$NEXT}}
           - Reorganize and extend buffer group documentation
+          - Add id method to BufferGroup
 
 0.012     2026-02-26 18:52:42+01:00 Europe/Brussels
           - Add statx and fstatx functions

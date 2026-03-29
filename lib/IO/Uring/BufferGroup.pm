@@ -49,4 +49,8 @@ Get the read value from the buffer group without copying it.
 
 This releases the given buffer, you should probably C<get> it first.
 
+=method id()
+
+This returns the id (as passed to C<add_buffer_group>).
+
 # ABSTRACT: a uring buffer group
